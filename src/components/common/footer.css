@@ -1,0 +1,27 @@
+.footer {
+     position: fixed;
+     bottom: 0;
+     width: 100%;
+     border-top: 1px solid rgb(149 149 149 / 12%);
+     border-radius: 0 !important;
+     -webkit-border-radius: 0 !important;
+     -moz-border-radius: 0 !important;
+     -ms-border-radius: 0 !important;
+     -o-border-radius: 0 !important;
+     background: var(--surface-overlay);
+}
+
+.social-section {
+     padding: 0 1rem;
+     display: flex;
+     flex-direction: row;
+     gap: 15px;
+     list-style: none !important;
+     overflow: hidden !important;
+     color: var(--text-color);
+}
+
+.social-icon {
+     font-size: 1.3rem;
+     color: var(--text-color);
+}
