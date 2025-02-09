@@ -1,16 +1,17 @@
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
-import ukflag from '../../assets/flags/en-flag.svg'
-import esflag from '../../assets/flags/es-flag.svg'
-import { useState } from "react";
-
-interface Language {
-     languageName: string;
-     locale: string;
-     img: string;
-}
+import ukflag from '../../assets/flags/en-flag.svg';
+import esflag from '../../assets/flags/es-flag.svg';
+import useLocalStorage from '../../hooks/useLocalStorage';
+import i18n from '../../i18n';
+import { Language } from '../../types/language.type';
 
 const LanguageSwitcher = () => {
-     const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
+
+     const changeLanguage = (lng: string) => {
+          i18n.changeLanguage(lng);
+     }
+
+     const [selectedLanguage, setSelectedLanguage] = useLocalStorage("currentLanguage", { languageName: 'English', locale: 'en', img: 'ukflag' })
      const languages: Language[] = [
           { languageName: 'Español', locale: 'es', img: 'esflag' },
           { languageName: 'English', locale: 'en', img: 'ukflag' },
@@ -28,42 +29,23 @@ const LanguageSwitcher = () => {
           }
      }
 
-     const selectedLanguageTemplate = (option: Language, props: any) => {
-          if (option) {
-               return (
-                    <div className="flex align-items-center">
-                         <img alt={option.languageName} src={selectedImageLanguage(option.languageName)} className={`mr-2 flag flag-${option.locale.toLowerCase()}`} style={{ width: '18px' }} />
-                         {/* <div>{option.languageName}</div> */}
-                    </div>
-               );
-          }
-
-          return <span>{props.placeholder}</span>;
-     };
-
      const LanguageOptionTemplate = (option: Language) => {
-          return (
-               <div className="flex align-items-center">
-                    <img alt={option.languageName} src={selectedImageLanguage(option.languageName)} className={`mr-2 flag flag-${option.locale.toLowerCase()}`} style={{ width: '18px' }} />
-                    {/* <div>{option.languageName}</div> */}
-               </div>
-          );
+          return (<img alt={option.languageName} src={selectedImageLanguage(option.languageName)} className={`flag flag-${option.locale.toLowerCase()}`} style={{ width: '25px' }} />);
      };
 
      return (
           <Dropdown
-               style={{ width: '123px !important' }}
+               style={{ width: '70px !important', border: 0, background: 'transparent' }}
                value={selectedLanguage}
-               onChange={(e: DropdownChangeEvent) => setSelectedLanguage(e.value)}
+               onChange={(e: DropdownChangeEvent) => {
+                    changeLanguage(e.value.locale)
+                    setSelectedLanguage(e.value)
+               }}
                options={languages}
-               //optionLabel="languageName"
-               //placeholder="Select a Language"
-               valueTemplate={selectedLanguageTemplate}
+               valueTemplate={LanguageOptionTemplate}
                itemTemplate={LanguageOptionTemplate}
                className="dropDownLanguageSwitcher"
-               dropdownIcon={(opts) => {
-                    return (opts.iconProps as any)['data-pr-overlay-visible'] ? <i className='pi pi-chevron-up' /> : <i className='pi pi-chevron-down' />;
-               }} />
+          />
      );
 };
 

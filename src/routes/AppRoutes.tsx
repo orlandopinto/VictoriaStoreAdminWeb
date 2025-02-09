@@ -21,16 +21,11 @@ const AppRoutes = createBrowserRouter(
                path: "/",
                element: <App />,
                children: [
+                    { path: "/", element: <Login /> },
                     { path: "/account/login", element: <Login /> },
                     { path: "/account/logout", element: <Logout /> },
-
-                    {
-                         path: "/dashboard", element: (<ProtectedRoutes>{protectedRoute(Dashboard)}</ProtectedRoutes>)
-                    },
-
-                    {
-                         path: "/users", element: (<ProtectedRoutes>{protectedRoute(IndexUser)}</ProtectedRoutes>)
-                    },
+                    { path: "/dashboard", element: (<ProtectedRoutes>{protectedRoute(Dashboard)}</ProtectedRoutes>) },
+                    { path: "/users", element: (<ProtectedRoutes>{protectedRoute(IndexUser)}</ProtectedRoutes>) },
                     // { path: "/users/adduser", element: (<ProtectedRoutes><ProtectedAddUser /></ProtectedRoutes>) },
                     // { path: "/users/adduser/:id", element: (<ProtectedRoutes><ProtectedAddUser /></ProtectedRoutes>) },
 
@@ -43,9 +38,7 @@ const AppRoutes = createBrowserRouter(
                     // { path: "/subcategories/AddUpdateSubCategory", element: (<ProtectedRoutes><ProtectedAddUpdateSubCategory /></ProtectedRoutes>) },
                     // { path: "/subcategories/AddUpdateSubCategory/:id", element: (<ProtectedRoutes><ProtectedAddUpdateSubCategory /></ProtectedRoutes>) },
 
-                    {
-                         path: "/discounts", element: (<ProtectedRoutes>{protectedRoute(Discounts)}</ProtectedRoutes>)
-                    },
+                    { path: "/discounts", element: (<ProtectedRoutes>{protectedRoute(Discounts)}</ProtectedRoutes>) },
                     // { path: "/discounts/AddUpdateDiscount", element: (<ProtectedRoutes><ProtectedAddUpdateDiscount /></ProtectedRoutes>) },
                     // { path: "/discounts/AddUpdateDiscount/:id", element: (<ProtectedRoutes><ProtectedAddUpdateDiscount /></ProtectedRoutes>) },
 
@@ -62,10 +55,7 @@ const AppRoutes = createBrowserRouter(
                     // { path: "/products/AddUpdateProduct/:id", element: (<ProtectedRoutes><ProtectedAddUpdateProduct /></ProtectedRoutes>) },
 
                     // { path: "/tools/emailsender", element: (<ProtectedRoutes><ProtectedEmailSender /></ProtectedRoutes>) },
-                    {
-                         path: "*",
-                         element: (<PageNotFound />)
-                    }
+                    { path: "*", element: (<PageNotFound />) }
                ]
           }
      ]

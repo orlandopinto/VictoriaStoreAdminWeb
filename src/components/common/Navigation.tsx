@@ -46,6 +46,7 @@ const Navigation = () => {
           </Link>
      );
 
+     //Generico para efectos del menu projects
      const itemRenderer = (item: any) => (
           <Link to="/dashboard" className="flex align-items-center p-menuitem-link">
                <span className={item.icon} />
@@ -125,7 +126,7 @@ const Navigation = () => {
           }
      ];
 
-     const avatarItemRenderer = () => (
+     const profileHederMenuItemRenderer = () => (
           <div className='text-center pt-2 gap'>
                <div>
                     <Avatar
@@ -147,21 +148,17 @@ const Navigation = () => {
 
      const start = (
           <div className='flex align-items-center pr-3'>
-               <div>
-                    <img alt="logo" src={logo} height="35" className="mr-2"></img>
-               </div>
-               <div style={{ fontSize: '1.6rem' }}>
-                    Victoria Store
-               </div>
+               <div><img alt="logo" src={logo} height="35" className="mr-2"></img></div>
+               <div style={{ fontSize: '1.6rem' }}>Victoria Store</div>
           </div>)
 
      const menuLeft = useRef<Menu>(null);
-     const items2 = [
+     const menuItemsProfile = [
           {
                label: '',
                items: [
                     {
-                         template: avatarItemRenderer
+                         template: profileHederMenuItemRenderer
                     },
                     {
                          label: 'Mi Perfil',
@@ -192,11 +189,8 @@ const Navigation = () => {
                     <InputIcon className="pi pi-search"> </InputIcon>
                     <InputText placeholder="Buscar" className="p-inputtext-sm" />
                </IconField> */}
-               <div>
-                    <ThemeSelection />
-               </div>
+               <ThemeSelection />
                <div className="flex justify-content-center">
-                    <Menu model={items2} popup ref={menuLeft} id="popup-avatar-profile" />
                     <div className="flex flex-wrap justify-content-center gap-4 align-items-center px-4" >
                          <i className="pi pi-bell p-overlay-badge" >
                               <Badge value="2"></Badge>
@@ -209,10 +203,9 @@ const Navigation = () => {
                          </i>
                     </div>
                     <SwitchLanguages />
-
                </div>
                <div className="flex justify-content-center">
-                    <Menu model={items2} popup ref={menuLeft} id="popup-avatar-profile" />
+                    <Menu model={menuItemsProfile} popup ref={menuLeft} id="popup-avatar-profile" />
                     <Avatar
                          image={foto}
                          id="avatar"
