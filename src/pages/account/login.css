@@ -1,0 +1,349 @@
+.login-wrapper {
+     background-image: url('../../assets/svg/bg-login.svg');
+     width: 100%;
+     height: 100%;
+     background-size: cover;
+     background-repeat: no-repeat;
+     background-position: left;
+     height: 100vh;
+     background-color: #fff;
+}
+
+.forgotpassword-section>a,
+.login-intro-x.terms-section>span>a {
+     color: #0076FF !important;
+}
+
+.forgotpassword-section>a:hover,
+.login-intro-x.terms-section>span>a:hover {
+     color: red !important;
+}
+
+@media screen and (max-width: 1200px) {
+     .side-left {
+          display: none !important;
+     }
+
+     .login-wrapper {
+          background-image: url('');
+     }
+
+     .side-right {
+          width: 100% !important;
+          align-items: center !important;
+     }
+}
+
+@media screen and (max-width: 530px) {
+     .login-controls {
+          width: 80% !important;
+     }
+}
+
+#email,
+#password {
+     width: 100%;
+     font-family: var(--font-family);
+     font-feature-settings: var(--font-feature-settings, normal);
+     font-size: 1rem;
+     color: rgba(0, 0, 0, 0.87);
+     background: #ffffff;
+     padding: 1rem 1rem;
+     border: 1px solid rgba(0, 0, 0, 0.38);
+     transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, background-size 0.2s cubic-bezier(0.64, 0.09, 0.08, 1);
+     appearance: none;
+     border-radius: 4px;
+     outline-color: transparent;
+}
+
+#email::placeholder,
+#password::placeholder,
+.p-icon-field>.p-input-icon {
+     color: #3d3d3d !important;
+}
+
+#chkRememberMe {
+     appearance: none;
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     padding: 0;
+     margin: 0;
+     opacity: 0;
+     z-index: 1;
+     outline: 0 none;
+     cursor: pointer;
+}
+
+.checkbox-section>.p-checkbox.p-component>.p-checkbox-box {
+     border: 2px solid #757575;
+     background: #ffffff;
+     width: 18px;
+     height: 18px;
+     color: rgba(0, 0, 0, 0.87);
+     border-radius: 4px;
+     transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, background-size 0.2s cubic-bezier(0.64, 0.09, 0.08, 1);
+     outline-color: transparent;
+     border-color: #757575;
+     border-radius: 2px;
+     position: relative;
+}
+
+.remenber-section {
+     width: 100%;
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     color: #3d3d3d;
+     padding: 1rem 0px;
+     font-weight: 500;
+}
+
+.logo {
+     margin-left: 8rem;
+     display: flex;
+     align-items: center;
+}
+
+.logo>div>img {
+     width: 30px;
+}
+
+.logo>div>span {
+     font-size: 1.5rem;
+     padding-left: 1rem;
+}
+
+.login {
+     height: 100vh;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+}
+
+.side-left {
+     flex-direction: column;
+     display: flex;
+     width: 50%;
+     margin-bottom: 4rem;
+     color: #fff;
+}
+
+.paragraph-1,
+.paragraph-2 {
+     width: 60%;
+     padding-left: 5rem;
+     color: #fff;
+}
+
+h1,
+h3 {
+     color: #ffffffb5;
+}
+
+.login-image {
+     flex-direction: row;
+     display: flex;
+     align-items: center;
+     padding-left: 2rem;
+     width: 100%;
+}
+
+.login-image>img {
+     margin: 5rem 0 2rem 0;
+     width: 40%;
+     margin-left: 4rem;
+}
+
+.avatar-image {
+     height: 35px;
+     padding: 4px;
+     border: 1px solid #e0e0e0;
+     border-radius: 3px;
+     width: 46px;
+     -webkit-border-radius: 3px;
+     -moz-border-radius: 3px;
+     -ms-border-radius: 3px;
+     -o-border-radius: 3px;
+}
+
+.side-right {
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: start;
+     width: 50%;
+     gap: 1rem;
+}
+
+.login-controls {
+     width: 50%;
+     margin: 8rem;
+}
+
+.language-section {
+     width: 100%;
+     display: flex;
+     justify-content: end;
+     padding-right: 5rem;
+}
+
+.language-list {
+     width: 38px !important;
+     border: 0;
+}
+
+.overlay-language-list-container {
+     box-shadow: 0 0px 0px 2px rgba(0, 0, 0, 0.1), 0 -1px 0px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.overlay-language-list-container>.p-overlaypanel-content {
+     padding: 0;
+}
+
+.p-listbox.p-component.language-list>.p-listbox-list-wrapper {
+     overflow: hidden;
+}
+
+.p-listbox.p-component.language-list>.p-listbox-list-wrapper>ul>li {
+     padding: 5px;
+}
+
+.overlay-language-list-container>.p-overlaypanel-close {
+     display: none;
+}
+
+.login-controls>div>span {
+     color: #3d3d3d !important;
+}
+
+.terms-section {
+     padding: 8rem 0 0 0;
+     font-size: 1rem;
+}
+
+#btnLogin {
+     padding: 1rem 4rem;
+}
+
+*>.-login-intro-x:nth-child(1) {
+     z-index: 49;
+     opacity: 0;
+     position: relative;
+     transform: translate(-50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: .1s;
+}
+
+*>.-login-intro-x:nth-child(2) {
+     z-index: 49;
+     opacity: 0;
+     position: relative;
+     transform: translate(-50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: .2s;
+}
+
+*>.-login-intro-x:nth-child(3) {
+     z-index: 49;
+     opacity: 0;
+     position: relative;
+     transform: translate(-50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: calc(3* .1s);
+}
+
+*>.-login-intro-x:nth-child(4) {
+     z-index: 49;
+     opacity: 0;
+     position: relative;
+     transform: translate(-50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: calc(3* .2s);
+}
+
+*>.login-intro-x:nth-child(1) {
+     z-index: 49;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: .1s;
+}
+
+*>.login-intro-x:nth-child(2) {
+     z-index: 48;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: .2s;
+}
+
+*>.login-intro-x:nth-child(3) {
+     z-index: 47;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: calc(3* .1s);
+}
+
+*>.login-intro-x:nth-child(3) {
+     z-index: 47;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: calc(3* .2s);
+}
+
+*>.login-intro-x:nth-child(4) {
+     z-index: 47;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: calc(2* .3s);
+}
+
+*>.login-intro-x:nth-child(5) {
+     z-index: 47;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: calc(2* .4s);
+}
+
+*>.login-intro-x:nth-child(6) {
+     z-index: 47;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: calc(2* .5s);
+}
+
+*>.login-intro-x:nth-child(7) {
+     z-index: 47;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: calc(2* .6s);
+}

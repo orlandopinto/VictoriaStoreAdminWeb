@@ -36,6 +36,7 @@ const Navigation = () => {
           <Link to="/taxes" className="flex align-items-center p-menuitem-link  p-3">
                <span className={item.icon} />
                <span className="mx-2">{item.label}</span>
+               <Ripple />
           </Link>
      );
 
@@ -43,6 +44,15 @@ const Navigation = () => {
           <Link to="/discounts" className="flex align-items-center p-menuitem-link p-3">
                <span className={item.icon} />
                <span className="mx-2">{item.label}</span>
+               <Ripple />
+          </Link>
+     );
+
+     const logoutItemRenderer = (item: any) => (
+          <Link to="/account/login" className="flex align-items-center p-menuitem-link p-3">
+               <span className={item.icon} />
+               <span className="mx-2">{item.label}</span>
+               <Ripple />
           </Link>
      );
 
@@ -51,6 +61,7 @@ const Navigation = () => {
           <Link to="/dashboard" className="flex align-items-center p-menuitem-link">
                <span className={item.icon} />
                <span className="mx-2">{item.label}</span>
+               <Ripple />
           </Link>
      );
 
@@ -178,7 +189,7 @@ const Navigation = () => {
                          label: 'Logout',
                          icon: 'pi pi-envelope',
                          badge: 3,
-                         template: discountsItemRenderer
+                         template: logoutItemRenderer
                     }
                ]
           }

@@ -11,6 +11,11 @@ body {
      height: 100vh;
 }
 
+.layout-wrapper,
+body {
+     background: var(--surface-100);
+}
+
 /* .p-menubar .p-menubar-root-list>.p-menuitem>.p-menuitem-content .p-menuitem-link>span,
 a.flex.align-items-center.p-menuitem-link>span.mx-2, */
 .mx-2 {

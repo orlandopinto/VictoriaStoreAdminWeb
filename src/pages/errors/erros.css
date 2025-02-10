@@ -1,0 +1,239 @@
+@keyframes intro-x-animation {
+     to {
+          opacity: 1;
+          transform: translate(0)
+     }
+}
+
+/******** ::::[  START NOT FOUND PAGE STYLES ] ::.. ********/
+.not-found {
+     height: 100vh;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     background-image: linear-gradient(to right top, #00deff, #00bfff, #009aff, #006cff, #6004f2);
+}
+
+.not-found-image {
+     height: 100vh;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     width: 100%;
+}
+
+.not-found-image>img {
+     width: 60%;
+}
+
+.not-found-content {
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: start;
+     width: 100%;
+     gap: 1rem;
+
+}
+
+*>.-intro-x:nth-child(1) {
+     z-index: 49;
+     opacity: 0;
+     position: relative;
+     transform: translate(-50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: .1s;
+}
+
+*>.intro-x:nth-child(1) {
+     z-index: 49;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: .1s;
+}
+
+*>.intro-x:nth-child(2) {
+     z-index: 48;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: .2s;
+}
+
+*>.intro-x:nth-child(3) {
+     z-index: 47;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: calc(3* .1s);
+}
+
+/******** ::::[  INTERNAL SERVER ERROR PAGE STYLES ] ::.. ********/
+.internal-server-error {
+     height: 100vh;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     background-image: linear-gradient(to right top, #00deff, #00bfff, #009aff, #006cff, #6004f2);
+}
+
+.internal-server-error-image {
+     height: 100vh;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     width: 100%;
+}
+
+.internal-server-error-image>img {
+     width: 60%;
+}
+
+.internal-server-error-content {
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: start;
+     width: 100%;
+     gap: 1rem;
+
+}
+
+*>.-internal-server-error-intro-x:nth-child(1) {
+     z-index: 49;
+     opacity: 0;
+     position: relative;
+     transform: translate(-50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: .1s;
+}
+
+*>.internal-server-error-intro-x:nth-child(1) {
+     z-index: 49;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: .1s;
+}
+
+*>.internal-server-error-intro-x:nth-child(2) {
+     z-index: 48;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: .2s;
+}
+
+*>.internal-server-error-intro-x:nth-child(3) {
+     z-index: 47;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: calc(3* .1s);
+}
+
+*>.internal-server-error-intro-x:nth-child(4) {
+     z-index: 47;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: calc(3* .2s);
+}
+
+/******** ::::[  START ACCESSS FORBIDDEN PAGE STYLES ] ::.. ********/
+.access-forbidden {
+     height: 100vh;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     background-image: linear-gradient(to right top, #00deff, #00bfff, #009aff, #006cff, #6004f2);
+}
+
+.access-forbidden-image>img {
+     width: 60%;
+}
+
+.access-forbidden-image {
+     height: 100vh;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     width: 100%;
+}
+
+.access-forbidden-content {
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: start;
+     width: 100%;
+     gap: 1rem;
+
+}
+
+*>.-access-forbidden-intro-x:nth-child(1) {
+     z-index: 49;
+     opacity: 0;
+     position: relative;
+     transform: translate(-50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: .1s;
+}
+
+*>.access-forbidden-intro-x:nth-child(1) {
+     z-index: 49;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: .1s;
+}
+
+*>.access-forbidden-intro-x:nth-child(2) {
+     z-index: 48;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: .2s;
+}
+
+*>.access-forbidden-intro-x:nth-child(3) {
+     z-index: 47;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: calc(3* .1s);
+}
+
+*>.access-forbidden-intro-x:nth-child(4) {
+     z-index: 47;
+     opacity: 0;
+     position: relative;
+     transform: translate(50px);
+     animation: .4s intro-x-animation ease-in-out .33333s;
+     animation-fill-mode: forwards;
+     animation-delay: calc(3* .2s);
+}

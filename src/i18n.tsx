@@ -1,7 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import translationEN from '../public/locales/en/translation.json'; // English
-import translationES from '../public/locales/es/translation.json'; // Spanish
+import translationEN from '../src/locales/en/translation.json'; // English
+import translationES from '../src/locales/es/translation.json'; // Spanish
 import { Language } from './types/language.type';
 
 const resources = {
@@ -9,7 +9,7 @@ const resources = {
      es: { translation: translationES },
 };
 
-const currentLanguage = JSON.parse(localStorage.getItem('currentLanguage') || '{"languageName": "Español", "locale": "es", "img": "esflag"}') as Language;
+const currentLanguage = JSON.parse(localStorage.getItem('currentLanguage') || '{ "locale": "es", "img": "esflag"}') as Language;
 
 i18n.use(initReactI18next).init({
      fallbackLng: 'es',

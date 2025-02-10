@@ -1,0 +1,23 @@
+{
+     "titles": {
+          "page1": "Bienvenidos a la pagina 1",
+          "page2": "Bienvenidos a la pagina 2"
+     },
+     "login": {
+          "primary-content-text": "Unos cuantos clics más para iniciar sesión en su cuenta.",
+          "secondary-content-text": "Administra todas tus cuentas de comercio electrónico en un solo lugar",
+          "remember-me": "Recordarme",
+          "forgot-password": "¿Olvidaste tu contraseña?",
+          "email": "Correo electrónico",
+          "placeholder-email": "cuenta@empresa.com",
+          "password": "Contraseña",
+          "sign-in": "Iniciar sesión",
+          "terms-and-conditions": "Terminos y Condiciones",
+          "privacy-police": "Política de privacidad",
+          "Login": "Acceder",
+          "knows-our": "Conoce nuestros"
+     },
+     "goodNight": "Buenas Noches",
+     "navSubtitle": "Resumen de tu desempeño esta semana",
+     "welcome": "Bienvenidos a mi aplicación!"
+}

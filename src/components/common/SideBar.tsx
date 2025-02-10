@@ -1,6 +1,5 @@
 
 import { Avatar } from 'primereact/avatar';
-import 'primereact/resources/themes/md-dark-indigo/theme.css';
 import { Ripple } from 'primereact/ripple';
 import { Sidebar } from 'primereact/sidebar';
 import { StyleClass } from 'primereact/styleclass';

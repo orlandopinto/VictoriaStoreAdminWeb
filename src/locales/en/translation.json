@@ -1,0 +1,23 @@
+{
+     "titles": {
+          "page1": "Welcome to page 1",
+          "page2": "Welcome to page 2"
+     },
+     "login": {
+          "primary-content-text": "A few more clicks to sign in to your account.",
+          "secondary-content-text": "Manage all your e-commerce accounts in one place",
+          "remember-me": "Remember me",
+          "forgot-password": "Forgot your password?",
+          "email": "Email",
+          "placeholder-email": "account@company.com",
+          "password": "Password",
+          "sign-in": "Sign in",
+          "terms-and-conditions": "Terms and Conditions",
+          "privacy-police": " Privacy Policy",
+          "Login": "Login",
+          "knows-our": "Knows ours"
+     },
+     "goodNight": "Good Night",
+     "navSubtitle": "Summary of your performance this week",
+     "welcome": "Welcome to my app!"
+}

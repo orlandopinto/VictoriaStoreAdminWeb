@@ -11,26 +11,28 @@ const LanguageSwitcher = () => {
           i18n.changeLanguage(lng);
      }
 
-     const [selectedLanguage, setSelectedLanguage] = useLocalStorage("currentLanguage", { languageName: 'English', locale: 'en', img: 'ukflag' })
+     const [selectedLanguage, setSelectedLanguage] = useLocalStorage("currentLanguage", { locale: 'en', img: 'ukflag' })
      const languages: Language[] = [
-          { languageName: 'Español', locale: 'es', img: 'esflag' },
-          { languageName: 'English', locale: 'en', img: 'ukflag' },
-          // { languageName: 'Catalán', locale: 'ca' },
+          { locale: 'es', img: 'esflag' },
+          { locale: 'en', img: 'ukflag' },
+          // {  locale: 'ca': img: 'caflag' },
      ];
 
-     const selectedImageLanguage = (languageName: string) => {
-          switch (languageName) {
-               case 'Español':
+     const selectedImageLanguage = (locale: string) => {
+          switch (locale) {
+               case 'es':
                     return esflag
-               case 'English':
+               case 'en':
                     return ukflag
+               // case 'ca':
+               //      return caflag
                default:
                     return esflag
           }
      }
 
      const LanguageOptionTemplate = (option: Language) => {
-          return (<img alt={option.languageName} src={selectedImageLanguage(option.languageName)} className={`flag flag-${option.locale.toLowerCase()}`} style={{ width: '25px' }} />);
+          return (<img alt={option.locale} src={selectedImageLanguage(option.locale)} style={{ width: '25px' }} />);
      };
 
      return (

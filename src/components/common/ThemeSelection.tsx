@@ -31,8 +31,8 @@ export default function ThemeSelection() {
                link.id = 'theme-link';
                link.rel = 'stylesheet';
                link.href = theme === 'dark'
-                    ? '../../../public/resourses/themes/dark-theme.css'
-                    : '../../../public/resourses/themes/light-theme.css';
+                    ? '../../../src/resourses/themes/dark-theme.css'
+                    : '../../../src/resourses/themes/light-theme.css';
 
                document.head.appendChild(link);
           }
