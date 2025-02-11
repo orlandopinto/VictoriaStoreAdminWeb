@@ -7,3 +7,5 @@ export const METHOD = {
      PUT: 'PUT',
      DELETE: 'DELETE'
 }
+
+export const encryptSecretKey = 'd77b7c8c9aa0cdcccb108befd90fff4b6d200d5d5a9d82c2fb62c884f20356ab'

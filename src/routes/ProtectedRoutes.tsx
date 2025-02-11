@@ -1,13 +1,15 @@
 import { Navigate, useLocation } from "react-router-dom";
-//import { useAuth } from "../contexts/useAuth";
+import { useAuth } from '../hooks/useAuth';
 
-type Pros = { children: React.ReactNode }
+type Pros = {
+     children: React.ReactNode
+}
 
 const ProtectedRoutes = ({ children }: Pros) => {
      const location = useLocation();
-     //const { isLoggedIn } = useAuth()
-     const isLoggedIn = true;
-     return isLoggedIn ? (
+     const { isAuthenticated } = useAuth()
+     //console.log('ProtectedRoutes -isAuthenticated: ', isAuthenticated())
+     return isAuthenticated() ? (
           <>
                {children}
           </>) : (

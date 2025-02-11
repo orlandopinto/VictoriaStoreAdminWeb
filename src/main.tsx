@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import '../src/assets/css/globalStyles.css';
 import AppRoutes from './routes/AppRoutes.tsx';
+import { AuthProvider } from './context/AuthContext.tsx';
 
 const value = {
   filterMatchMode: {
@@ -28,6 +29,8 @@ const value = {
 let root = createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <PrimeReactProvider value={value}>
-    <RouterProvider router={AppRoutes} />
+    <AuthProvider>
+      <RouterProvider router={AppRoutes} />
+    </AuthProvider>
   </PrimeReactProvider>
 );

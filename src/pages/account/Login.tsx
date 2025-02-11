@@ -16,8 +16,9 @@ import esflag from '../../assets/flags/es-flag.svg';
 import loginImage from '../../assets/svg/login.svg';
 import logo from '../../assets/svg/logo.svg';
 import { AuthController } from '../../controllers/auth.controller';
-import useLocalStorage from '../../hooks/useLocalStorage';
-import i18n from '../../i18n';
+import { useAuth } from '../../hooks/useAuth';
+import useLanguages from '../../hooks/useLanguages';
+import { apiResult, AuthProfile } from '../../types/auth-profile.type';
 import { Language } from '../../types/language.type';
 import { Validators } from '../../utils/Validators';
 import './login.css';
@@ -30,14 +31,11 @@ function Login() {
      const [password, setPassword] = useState<string>('');
      const [checked, setChecked] = useState(false);
      const [validated, setValidated] = useState(false);
+     const { loginUser } = useAuth()
 
-     //LANGUAGE SELECTION SECTION
-     const changeLanguage = (lng: string) => {
-          i18n.changeLanguage(lng);
-     }
-     const [selectedLanguage, setSelectedLanguage] = useLocalStorage("currentLanguage", { locale: 'es', img: 'esflag' })
+     const [languages, changeLanguage, selectedLanguage, setSelectedLanguage] = useLanguages(esflag, ukflag) as any;
      const languageOptionRef = useRef<OverlayPanel>(null);
-     const languages: Language[] = [{ locale: 'en', img: 'ukflag' }, { locale: 'es', img: 'esflag' },];
+
      const languagesTemplate = (option: Language) => {
           return (<img alt={option.locale} src={option.img === 'ukflag' ? ukflag : esflag} style={{ width: '2rem' }} />);
      };
@@ -59,14 +57,22 @@ function Login() {
                     return
                }
                const response = await AuthController.Login(email, password)
-               console.log('response: ', response)
+               //TODO: tipo temporal, homologar con AuthProfile
+               const apiResponse = response as unknown as apiResult
+               const authProfile: AuthProfile = {
+                    email: email,
+                    fullName: apiResponse.user.userName,
+                    isAuthenticated: true,
+                    userName: apiResponse.user.userName,
+                    token: apiResponse.token
+               }
+               loginUser(authProfile);
                navigate('/dashboard')
           } catch (error) {
                const handledError = (error as AxiosError).response?.data as Record<string, string>
                errorAlert(handledError.error)
           }
      }
-
 
      const errorAlert = (message: string) => {
           confirmDialog({
@@ -111,6 +117,7 @@ function Login() {
                                         onChange={(e: ListBoxChangeEvent) => {
                                              if (e.value !== null) {
                                                   setSelectedLanguage(e.value)
+                                                  localStorage.setItem('lang', e.value.locale)
                                                   changeLanguage(e.value.locale)
                                              }
                                         }}

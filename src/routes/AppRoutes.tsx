@@ -1,17 +1,17 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 import Layout from "../components/common/Layout";
-import PageNotFound from "../pages/errors/404";
+import ForgotPassword from "../pages/account/ForgotPassword";
 import Login from "../pages/account/Login";
 import Logout from "../pages/account/Logout";
 import Dashboard from "../pages/admin/Dashboard";
 import Discounts from "../pages/admin/Discounts";
 import Taxes from "../pages/admin/Taxes";
+import AccessForbidden from "../pages/errors/403";
+import PageNotFound from "../pages/errors/404";
+import InternalServerError from "../pages/errors/500";
 import IndexUser from "../pages/users/Index";
 import ProtectedRoutes from "./ProtectedRoutes";
-import InternalServerError from "../pages/errors/500";
-import AccessForbidden from "../pages/errors/403";
-import ForgotPassword from "../pages/account/ForgotPassword";
 
 const protectedRoute = (component: any) => {
      const LayoutComponent = Layout(component);
