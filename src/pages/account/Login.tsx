@@ -1,30 +1,35 @@
+import { AxiosError } from 'axios';
 import { Avatar } from 'primereact/avatar';
 import { Button } from 'primereact/button';
 import { Checkbox, CheckboxChangeEvent } from 'primereact/checkbox';
+import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { InputText } from 'primereact/inputtext';
 import { ListBox, ListBoxChangeEvent } from 'primereact/listbox';
 import { OverlayPanel } from 'primereact/overlaypanel';
-import { useRef, useState } from 'react';
+import { SyntheticEvent, useRef, useState } from 'react';
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from 'react-router-dom';
+import { Form, Link, useNavigate } from 'react-router-dom';
 import ukflag from '../../assets/flags/en-flag.svg';
 import esflag from '../../assets/flags/es-flag.svg';
 import loginImage from '../../assets/svg/login.svg';
 import logo from '../../assets/svg/logo.svg';
+import { AuthController } from '../../controllers/auth.controller';
 import useLocalStorage from '../../hooks/useLocalStorage';
 import i18n from '../../i18n';
 import { Language } from '../../types/language.type';
+import { Validators } from '../../utils/Validators';
 import './login.css';
 
 function Login() {
 
      const { t } = useTranslation();
      const navigate = useNavigate();
-     const [value, setValue] = useState<string>('');
+     const [email, setEmail] = useState<string>('');
      const [password, setPassword] = useState<string>('');
      const [checked, setChecked] = useState(false);
+     const [validated, setValidated] = useState(false);
 
      //LANGUAGE SELECTION SECTION
      const changeLanguage = (lng: string) => {
@@ -35,6 +40,42 @@ function Login() {
      const languages: Language[] = [{ locale: 'en', img: 'ukflag' }, { locale: 'es', img: 'esflag' },];
      const languagesTemplate = (option: Language) => {
           return (<img alt={option.locale} src={option.img === 'ukflag' ? ukflag : esflag} style={{ width: '2rem' }} />);
+     };
+
+     const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
+          e.preventDefault();
+          if (e.currentTarget.checkValidity() === false) {
+               setValidated(true);
+          }
+          else {
+               await onLogin();
+          }
+     }
+
+     const onLogin = async () => {
+          try {
+               if (!Validators.email.test(email)) {
+                    errorAlert('Email is not valid')
+                    return
+               }
+               const response = await AuthController.Login(email, password)
+               console.log('response: ', response)
+               navigate('/dashboard')
+          } catch (error) {
+               const handledError = (error as AxiosError).response?.data as Record<string, string>
+               errorAlert(handledError.error)
+          }
+     }
+
+
+     const errorAlert = (message: string) => {
+          confirmDialog({
+               group: 'headless',
+               message: message,
+               header: 'Error',
+               icon: 'pi pi-info-circle',
+               defaultFocus: 'accept'
+          });
      };
 
      return (
@@ -78,40 +119,80 @@ function Login() {
                                         className="language-list" />
                               </OverlayPanel>
                          </div>
-                         <div className="login-controls">
-                              <div className="login-intro-x font-medium text-4xl pb-5">
-                                   <span>{t('login.sign-in')}</span>
-                              </div>
-                              <div className="login-intro-x mt-3 text-lg">
-                                   <IconField iconPosition="left">
-                                        <InputIcon className="pi pi-user" />
-                                        <InputText id="email" name="email" placeholder={t('login.placeholder-email')} value={value} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)} ></InputText>
-                                   </IconField>
-                              </div>
-                              <div className="login-intro-x mt-3 text-lg">
-                                   <IconField iconPosition="left">
-                                        <InputIcon className="pi pi-lock" />
-                                        <InputText id="password" name="password" placeholder={t('login.password')} type="password" value={password} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)} />
-                                   </IconField>
-                              </div>
-                              <div className="login-intro-x remenber-section">
-                                   <div className='checkbox-section'>
-                                        <Checkbox name="chkRememberMe" inputId='chkRememberMe' onChange={(ev: CheckboxChangeEvent) => setChecked(ev.checked as boolean)} checked={checked} />
-                                        <label htmlFor="chkRememberMe" className="ml-2">{t('login.remember-me')}</label>
+                         <Form noValidate onSubmit={handleSubmit}>
+                              <div className="login-controls">
+                                   <div className="login-intro-x font-medium text-4xl pb-5">
+                                        <span>{t('login.sign-in')}</span>
                                    </div>
-                                   <div className='forgotpassword-section'>
-                                        <Link to="/account/forgotpassword">{t('login.forgot-password')}</Link>
+                                   <div className="login-intro-x mt-3 text-lg">
+                                        <IconField iconPosition="left">
+                                             <InputIcon className="pi pi-user" />
+                                             <InputText
+                                                  id="email"
+                                                  name="email"
+                                                  placeholder={t('login.placeholder-email')}
+                                                  value={email}
+                                                  className={validated === true && email === '' ? "p-invalid" : ""}
+                                                  required={true}
+                                                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)} >
+                                             </InputText>
+                                        </IconField>
+                                        {validated === true && email === '' ? <p className='invalid-field'> <i className="pi pi-exclamation-triangle" />  Email is required</p> : ""}
+                                   </div>
+                                   <div className="login-intro-x mt-3 text-lg">
+                                        <IconField iconPosition="left">
+                                             <InputIcon className="pi pi-lock" />
+                                             <InputText
+                                                  id="password"
+                                                  name="password"
+                                                  placeholder={t('login.password')}
+                                                  type="password"
+                                                  value={password}
+                                                  className={validated === true && password === '' ? "p-invalid" : ""}
+                                                  required={true}
+                                                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)} />
+                                        </IconField>
+                                        {validated === true && password === '' ? <p className='invalid-field'> <i className="pi pi-exclamation-triangle" />  Password is required</p> : ""}
+                                   </div>
+                                   <div className="login-intro-x remenber-section">
+                                        <div className='checkbox-section'>
+                                             <Checkbox name="chkRememberMe" inputId='chkRememberMe' onChange={(ev: CheckboxChangeEvent) => setChecked(ev.checked as boolean)} checked={checked} />
+                                             <label htmlFor="chkRememberMe" className="ml-2">{t('login.remember-me')}</label>
+                                        </div>
+                                        <div className='forgotpassword-section'>
+                                             <Link to="/account/forgotpassword">{t('login.forgot-password')}</Link>
+                                        </div>
+                                   </div>
+                                   <div className="login-intro-x pt-3">
+                                        <Button id="btnLogin"> {t('login.Login')} </Button>
+                                   </div>
+                                   <div className='login-intro-x terms-section text-center'>
+                                        <span>{t('login.knows-our')} <a href="#">{t('login.terms-and-conditions')}</a> - <a href="#">{t('login.privacy-police')}</a></span>
                                    </div>
                               </div>
-                              <div className="login-intro-x pt-3">
-                                   <Button id="btnLogin" onClick={() => navigate('/dashboard')}> {t('login.Login')} </Button>
-                              </div>
-                              <div className='login-intro-x terms-section'>
-                                   <span>{t('login.knows-our')} <a href="#">{t('login.terms-and-conditions')}</a> - <a href="#">{t('login.privacy-police')}</a></span>
-                              </div>
-                         </div>
+                         </Form>
                     </div>
                </div>
+               <ConfirmDialog
+                    className='error-dialog'
+                    group="headless"
+                    content={({ headerRef, contentRef, hide, message }) => (
+                         <div className="flex flex-column align-items-center p-5 surface-overlay border-round">
+                              <div className="border-circle bg-red inline-flex justify-content-center align-items-center h-6rem w-6rem -mt-8">
+                                   <i className="pi pi-times text-5xl"></i>
+                              </div>
+                              <span className="font-bold text-2xl block mb-2 mt-4" ref={headerRef}>
+                                   {message.header}
+                              </span>
+                              <span className="mb-0" ref={contentRef}>
+                                   {message.message}
+                              </span>
+                              <div className="flex align-items-center gap-2 mt-4">
+                                   <Button label="Aceptar" onClick={(event) => { hide(event) }} className="w-8rem" />
+                              </div>
+                         </div>
+                    )}
+               />
           </div>
      )
 }

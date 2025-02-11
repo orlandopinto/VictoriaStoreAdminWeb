@@ -347,3 +347,30 @@ h3 {
      animation-fill-mode: forwards;
      animation-delay: calc(2* .6s);
 }
+
+.invalid-field {
+     padding: 4px 0 0px 2px;
+     font-size: .8rem;
+     color: red;
+}
+
+.p-invalid {
+     border: 1px solid red !important;
+}
+
+.bg-red {
+     background-color: #4c3a95;
+}
+
+.bg-red>i {
+     color: #fff;
+}
+
+.error-dialog {
+     width: 15%;
+}
+
+.error-dialog>div {
+     background-color: #fff !important;
+     color: #000;
+}
