@@ -6,6 +6,7 @@ import { StyleClass } from 'primereact/styleclass';
 import { Dispatch, SetStateAction, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/svg/logo.svg';
+import profilePicture from '../../assets/images/Orlando.png'
 import './sidebar.css';
 
 interface Props {
@@ -142,7 +143,7 @@ export default function SideBar({ visible, setVisible }: Props) {
                                         <div className="mt-auto">
                                              <hr className="mb-3 mx-3 border-top-1 border-none surface-border" />
                                              <a className="m-3 flex align-items-center cursor-pointer p-3 gap-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
-                                                  <Avatar image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png" shape="circle" />
+                                                  <Avatar image={profilePicture} shape="circle" />
                                                   <span className="font-bold">Orlando Pinto</span>
                                              </a>
                                         </div>

@@ -3,13 +3,13 @@ import App from "../App";
 import Layout from "../components/common/Layout";
 import ForgotPassword from "../pages/account/ForgotPassword";
 import Login from "../pages/account/Login";
-import Logout from "../pages/account/Logout";
 import Dashboard from "../pages/admin/Dashboard";
 import Discounts from "../pages/admin/Discounts";
 import Taxes from "../pages/admin/Taxes";
 import AccessForbidden from "../pages/errors/403";
 import PageNotFound from "../pages/errors/404";
 import InternalServerError from "../pages/errors/500";
+import Statistics from "../pages/statistics/Statistics";
 import IndexUser from "../pages/users/Index";
 import ProtectedRoutes from "./ProtectedRoutes";
 
@@ -26,7 +26,6 @@ const AppRoutes = createBrowserRouter(
                children: [
                     { path: "/", element: <Login /> },
                     { path: "/account/login", element: <Login /> },
-                    { path: "/account/logout", element: <Logout /> },
                     { path: "/account/forgotpassword", element: <ForgotPassword /> },
                     { path: "/dashboard", element: (<ProtectedRoutes>{protectedRoute(Dashboard)}</ProtectedRoutes>) },
                     { path: "/users", element: (<ProtectedRoutes>{protectedRoute(IndexUser)}</ProtectedRoutes>) },
@@ -59,6 +58,7 @@ const AppRoutes = createBrowserRouter(
                     // { path: "/products/AddUpdateProduct/:id", element: (<ProtectedRoutes><ProtectedAddUpdateProduct /></ProtectedRoutes>) },
 
                     // { path: "/tools/emailsender", element: (<ProtectedRoutes><ProtectedEmailSender /></ProtectedRoutes>) },
+                    { path: "/taxes", element: (<ProtectedRoutes>{protectedRoute(Statistics)}</ProtectedRoutes>) },
                     { path: "/errors/500", element: (<InternalServerError />) },
                     { path: "/errors/403", element: (<AccessForbidden />) },
                     { path: "*", element: (<PageNotFound />) }

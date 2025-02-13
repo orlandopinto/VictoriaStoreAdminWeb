@@ -1,25 +1,16 @@
 import { AxiosError } from 'axios';
-import { Avatar } from 'primereact/avatar';
-import { Button } from 'primereact/button';
-import { Checkbox, CheckboxChangeEvent } from 'primereact/checkbox';
-import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
-import { IconField } from "primereact/iconfield";
-import { InputIcon } from "primereact/inputicon";
-import { InputText } from 'primereact/inputtext';
-import { ListBox, ListBoxChangeEvent } from 'primereact/listbox';
-import { OverlayPanel } from 'primereact/overlaypanel';
-import { SyntheticEvent, useRef, useState } from 'react';
+import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from "react-i18next";
 import { Form, Link, useNavigate } from 'react-router-dom';
 import ukflag from '../../assets/flags/en-flag.svg';
 import esflag from '../../assets/flags/es-flag.svg';
 import loginImage from '../../assets/svg/login.svg';
 import logo from '../../assets/svg/logo.svg';
+import { Avatar, Button, Checkbox, CheckboxChangeEvent, ConfirmDialog, confirmDialog, IconField, InputIcon, InputText, ListBox, ListBoxChangeEvent, OverlayPanel } from '../../components/primereact/index';
 import { AuthController } from '../../controllers/auth.controller';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks';
 import useLanguages from '../../hooks/useLanguages';
-import { apiResult, AuthProfile } from '../../types/auth-profile.type';
-import { Language } from '../../types/language.type';
+import { AuthProfile, Language } from '../../types';
 import { Validators } from '../../utils/Validators';
 import './login.css';
 
@@ -31,7 +22,13 @@ function Login() {
      const [password, setPassword] = useState<string>('');
      const [checked, setChecked] = useState(false);
      const [validated, setValidated] = useState(false);
-     const { loginUser } = useAuth()
+     const { loginUser, isAuthenticated } = useAuth()
+
+     useEffect(() => {
+          //TODO: Hay que esperar que caduque el token para ver si redirecciona
+          if (isAuthenticated())
+               navigate('/dashboard')
+     }, [])
 
      const [languages, changeLanguage, selectedLanguage, setSelectedLanguage] = useLanguages(esflag, ukflag) as any;
      const languageOptionRef = useRef<OverlayPanel>(null);
@@ -56,16 +53,8 @@ function Login() {
                     errorAlert('Email is not valid')
                     return
                }
-               const response = await AuthController.Login(email, password)
-               //TODO: tipo temporal, homologar con AuthProfile
-               const apiResponse = response as unknown as apiResult
-               const authProfile: AuthProfile = {
-                    email: email,
-                    fullName: apiResponse.user.userName,
-                    isAuthenticated: true,
-                    userName: apiResponse.user.userName,
-                    token: apiResponse.token
-               }
+               const authProfile = await AuthController.Login(email, password) as unknown as AuthProfile
+               console.log('login - authProfile: ', authProfile)
                loginUser(authProfile);
                navigate('/dashboard')
           } catch (error) {
@@ -137,6 +126,7 @@ function Login() {
                                              <InputText
                                                   id="email"
                                                   name="email"
+                                                  autoComplete='email'
                                                   placeholder={t('login.placeholder-email')}
                                                   value={email}
                                                   className={validated === true && email === '' ? "p-invalid" : ""}
@@ -157,6 +147,7 @@ function Login() {
                                                   value={password}
                                                   className={validated === true && password === '' ? "p-invalid" : ""}
                                                   required={true}
+                                                  autoComplete='current-password'
                                                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)} />
                                         </IconField>
                                         {validated === true && password === '' ? <p className='invalid-field'> <i className="pi pi-exclamation-triangle" />  Password is required</p> : ""}

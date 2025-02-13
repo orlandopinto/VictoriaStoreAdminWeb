@@ -24771,15 +24771,6 @@ svg.DocSearch-Hit-Select-Icon {
      animation-fill-mode: both !important
 }
 
-@font-face {
-     font-family: primeicons;
-     font-display: block;
-     src: url(/_next/static/media/primeicons.8ca441e1.eot);
-     src: url(/_next/static/media/primeicons.8ca441e1.eot?#iefix) format("embedded-opentype"), url(/_next/static/media/primeicons.e1a53edb.woff2) format("woff2"), url(/_next/static/media/primeicons.7f772274.woff) format("woff"), url(/_next/static/media/primeicons.310a7310.ttf) format("truetype"), url(/_next/static/media/primeicons.19e14e48.svg?#primeicons) format("svg");
-     font-weight: 400;
-     font-style: normal
-}
-
 .pi {
      font-family: primeicons;
      speak: none;

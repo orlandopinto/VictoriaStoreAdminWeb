@@ -9,6 +9,7 @@ import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import foto from '../../assets/images/Orlando.png';
 import logo from '../../assets/svg/logo.svg';
+import { useAuth } from '../../hooks';
 import SwitchLanguages from './LanguageSwitcher';
 import './navigation.css';
 import SideBar from './SideBar';
@@ -16,6 +17,7 @@ import ThemeSelection from './ThemeSelection';
 
 const Navigation = () => {
      const toast = useRef(null);
+     const { logout } = useAuth()
      const [visible, setVisible] = useState(false);
 
      // const sidebarItemRenderer = (item: any) => (
@@ -49,11 +51,11 @@ const Navigation = () => {
      );
 
      const logoutItemRenderer = (item: any) => (
-          <Link to="/account/login" className="flex align-items-center p-menuitem-link p-3">
+          <a href="/" onClick={() => logout()} className="flex align-items-center p-menuitem-link p-3">
                <span className={item.icon} />
                <span className="mx-2">{item.label}</span>
                <Ripple />
-          </Link>
+          </a>
      );
 
      //Generico para efectos del menu projects

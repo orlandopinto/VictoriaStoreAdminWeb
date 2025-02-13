@@ -2,14 +2,14 @@ import { FilterMatchMode, PrimeReactProvider } from 'primereact/api';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import '../src/assets/css/globalStyles.css';
-import AppRoutes from './routes/AppRoutes.tsx';
 import { AuthProvider } from './context/AuthContext.tsx';
+import AppRoutes from './routes/AppRoutes.tsx';
 
 const value = {
   filterMatchMode: {
     text: [FilterMatchMode.STARTS_WITH, FilterMatchMode.CONTAINS, FilterMatchMode.NOT_CONTAINS, FilterMatchMode.ENDS_WITH, FilterMatchMode.EQUALS, FilterMatchMode.NOT_EQUALS],
     numeric: [FilterMatchMode.EQUALS, FilterMatchMode.NOT_EQUALS, FilterMatchMode.LESS_THAN, FilterMatchMode.LESS_THAN_OR_EQUAL_TO, FilterMatchMode.GREATER_THAN, FilterMatchMode.GREATER_THAN_OR_EQUAL_TO],
-    date: [FilterMatchMode.DATE_IS, FilterMatchMode.DATE_IS_NOT, FilterMatchMode.DATE_BEFORE, FilterMatchMode.DATE_AFTER]
+    date: [FilterMatchMode.DATE_IS, FilterMatchMode.DATE_IS_NOT, FilterMatchMode.DATE_BEFORE, FilterMatchMode.DATE_AFTER, FilterMatchMode.IN]
   },
   cssTransition: true,
   hideOverlaysOnDocumentScrolling: true,
