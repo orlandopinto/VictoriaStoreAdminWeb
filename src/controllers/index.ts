@@ -1,0 +1,6 @@
+export * from './auth.controller'
+export * from './permission.controller'
+export * from './roles.controller'
+export * from './user.controller'
+export * from './resourses.controller'
+export * from './actions.controller'

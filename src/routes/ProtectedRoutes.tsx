@@ -19,13 +19,21 @@ const ProtectedRoutes = ({ children }: Pros) => {
 
 export default ProtectedRoutes;
 
-// interface Props {
-//      isAllowed: boolean
-//      redirectTo?: string
-// }
+// const ProtectedRoutes = ({ children, resourse }: Pros) => {
+//      const { isAllowed } = useAuth();
+//      const location = useLocation();
+//      const { isAuthenticated } = useAuth()
 
-// const ProtectedRoutes = ({ isAllowed, redirectTo = "/account/login" }: Props) => {
-//      return isAllowed ? <Outlet /> : <Navigate to={redirectTo} />
-// }
+//      return isAuthenticated() ? (
+//           resourse === undefined || isAllowed(resourse) ? (
+//                <>{children}</>
+//           ) : (
+//                <Navigate to="/errors/403" state={{ from: location }} replace />
+//           )
+//      ) : (
+//           <Navigate to="/account/login" state={{ from: location }} replace />
+//      );
+// };
+
 
 // export default ProtectedRoutes

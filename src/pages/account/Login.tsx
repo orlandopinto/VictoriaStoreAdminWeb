@@ -1,4 +1,3 @@
-import { AxiosError } from 'axios';
 import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from "react-i18next";
 import { Form, Link, useNavigate } from 'react-router-dom';
@@ -8,11 +7,13 @@ import loginImage from '../../assets/svg/login.svg';
 import logo from '../../assets/svg/logo.svg';
 import { Avatar, Button, Checkbox, CheckboxChangeEvent, ConfirmDialog, confirmDialog, IconField, InputIcon, InputText, ListBox, ListBoxChangeEvent, OverlayPanel } from '../../components/primereact/index';
 import { AuthController } from '../../controllers/auth.controller';
+import { PermissionController } from '../../controllers/permission.controller';
 import { useAuth } from '../../hooks';
 import useLanguages from '../../hooks/useLanguages';
-import { AuthProfile, Language } from '../../types';
+import { ApiResultResponse, Language, Permissions } from '../../types';
 import { Validators } from '../../utils/Validators';
 import './login.css';
+import { AxiosError } from 'axios';
 
 function Login() {
 
@@ -22,7 +23,8 @@ function Login() {
      const [password, setPassword] = useState<string>('');
      const [checked, setChecked] = useState(false);
      const [validated, setValidated] = useState(false);
-     const { loginUser, isAuthenticated } = useAuth()
+     const { storeSessionData, isAuthenticated } = useAuth()
+     const [loading, setLoading] = useState<boolean>(false);
 
      useEffect(() => {
           //TODO: Hay que esperar que caduque el token para ver si redirecciona
@@ -49,18 +51,51 @@ function Login() {
 
      const onLogin = async () => {
           try {
+               setLoading(true)
+
                if (!Validators.email.test(email)) {
                     errorAlert('Email is not valid')
                     return
                }
-               const authProfile = await AuthController.Login(email, password) as unknown as AuthProfile
-               console.log('login - authProfile: ', authProfile)
-               loginUser(authProfile);
+               const apiResultResponse = await AuthController.Login(email, password) as unknown as ApiResultResponse
+               if (apiResultResponse.hasError) {
+                    const err = apiResultResponse.errorMessage
+                    console.log('err: ', err)
+                    if (err && err.length > 0) {
+                         errorAlert(err)
+                    }
+                    return
+               }
+               const permissions = await getPermission(apiResultResponse.data.token) as unknown as Permissions[]
+
+               storeSessionData(apiResultResponse.data, permissions);
                navigate('/dashboard')
+          } catch (error) {
+               setLoading(false);
+               const handledError = (error as AxiosError).response?.data as Record<string, string>
+               errorAlert(handledError.error)
+          }
+          finally {
+               setLoading(false);
+          }
+     }
+
+     const getPermission = async (token: string): Promise<Permissions[]> => {
+          try {
+               const result = await new PermissionController(token).Get() as unknown as ApiResultResponse
+               if (result.hasError) {
+                    const err = result.errorMessage
+                    console.log('err: ', err)
+                    if (err && err.length > 0) {
+                         errorAlert(err)
+                    }
+               }
+               return result.data as unknown as Permissions[]
           } catch (error) {
                const handledError = (error as AxiosError).response?.data as Record<string, string>
                errorAlert(handledError.error)
           }
+          return [] as unknown as Permissions[]
      }
 
      const errorAlert = (message: string) => {
@@ -162,7 +197,7 @@ function Login() {
                                         </div>
                                    </div>
                                    <div className="login-intro-x pt-3">
-                                        <Button id="btnLogin"> {t('login.Login')} </Button>
+                                        <Button icon="pi pi-check" id="btnLogin" loading={loading}><span className='pl-3'>{t('login.Login')}</span> </Button>
                                    </div>
                                    <div className='login-intro-x terms-section text-center'>
                                         <span>{t('login.knows-our')} <a href="#">{t('login.terms-and-conditions')}</a> - <a href="#">{t('login.privacy-police')}</a></span>

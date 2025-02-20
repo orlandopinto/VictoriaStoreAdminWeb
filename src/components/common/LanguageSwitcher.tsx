@@ -9,7 +9,10 @@ const LanguageSwitcher = () => {
      const [languages, changeLanguage, selectedLanguage, setSelectedLanguage, selectedImageLanguage] = useLanguages(esflag, ukflag) as any;
 
      const LanguageOptionTemplate = (option: Language) => {
-          return (<img alt={option.locale} src={selectedImageLanguage(option.locale)} style={{ width: '25px' }} />);
+          if (option)
+               return (<img alt={option.locale} src={selectedImageLanguage(option.locale)} style={{ width: '25px' }} />);
+          else
+               return (<img alt={"Español"} src={selectedImageLanguage("es")} style={{ width: '25px' }} />);
      };
 
      return (

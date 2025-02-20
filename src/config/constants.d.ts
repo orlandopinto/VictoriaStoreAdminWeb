@@ -1,6 +1,13 @@
 export const URL_BASE = 'http://localhost:3000'
 export const AUTH_ENDPOINT = '/api/systemauth'
 export const USER_ENDPOINT = '/api/systemauth'
+export const ROLES_ENDPOINT = '/api/roles'
+export const ACCESS_ENDPOINT = '/api/access'
+export const RESOURSES_ENDPOINT = '/api/resourses'
+export const ACTIONS_ENDPOINT = '/api/actions'
+export const PERMISSION_ENDPOINT = '/api/permissions'
+
+export const FOLDER_TO_UPLOAD = 'ProductImages'
 
 export const METHOD = {
      GET: 'GET',
@@ -13,7 +20,6 @@ export const ACTIONS = {
      LIST: 'list',
      CREATE: 'create',
      EDIT: 'edit',
-     UPDATE: 'update',
      DELETE: 'delete',
      VIEW: 'view',
      EXPORT_TO_PDF: 'exportToPdf',

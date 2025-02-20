@@ -1,0 +1,19 @@
+.w-full.p-tree.p-component.p-tree-selectable {
+     border: none;
+}
+
+.p-tree .p-tree-container .p-treenode {
+     padding: 0 !important;
+}
+
+.p-dialog-footer {
+     border-top: 1px solid var(--gray-500);
+}
+
+.card-container {
+     height: 68vh !important;
+}
+
+.pi-external-link:before {
+     font-size: 1.1rem;
+}

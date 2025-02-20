@@ -1,13 +1,7 @@
-export type UserPermissions = {
-     resourse: string,
-     actions: string[]
-}
-
 export type AuthProfile = {
      token: string,
      user: {
           id: string,
-          userName: string,
           email: string,
           password: string,
           address?: String,
