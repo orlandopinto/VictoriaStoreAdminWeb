@@ -1,4 +1,3 @@
-//import { useTranslation } from "react-i18next";
 import { AxiosError } from 'axios';
 import { FilterMatchMode } from "primereact/api";
 import { Sidebar } from "primereact/sidebar";
@@ -10,34 +9,32 @@ import { ACTIONS } from '../../config/constants.d';
 import { UserController } from "../../controllers/user.controller";
 import { useAuth } from "../../hooks";
 import { UserData } from "../../types";
+import { Permissions } from '../../types/permissions';
 import "./index.css";
 
 const IndexUser = () => {
      //..:: [ VARIABLES ] ::..
 
-
+     //..:: [ HOOKS ] ::..
      //WARNING: ..:: [ Las siguientes lineas son obligatiorias para ejecutar los permisos ]::..
-     const [resourse] = useState('users')
-     const { userLoggedData, isAllowed, logout, hasAction } = useAuth();
-
-     useEffect(() => {
-          if (!isAllowed(resourse)) {
-               navigate('/errors/403')
-          }
-          getUsersData()
-     }, [])
+     const { getToken, logout, hasAction, getPermissionList, isAllowed } = useAuth();
+     const navigate = useNavigate();
      //..::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::..
 
-     const controller = new UserController(userLoggedData?.token as string)
+     useEffect(() => {
+          getUsersData()
+     }, [])
+
+     const controller = new UserController(getToken())
 
      //..:: [ HOOKS ] ::..
-     const navigate = useNavigate();
      //const { t } = useTranslation();
      const [userList, setUserList] = useState<UserData[]>([])
      const [loading, setLoading] = useState<boolean>(true);
      const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
      const [visibleRight, setVisibleRight] = useState<boolean>(false);
      const [dialogVisible, setDialogVisible] = useState(false);
+     const [permissions, setPermissions] = useState([] as Permissions[])
 
      const [filters, setFilters] = useState<DataTableFilterMeta>({
           global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -52,9 +49,14 @@ const IndexUser = () => {
 
      const getUsersData = async () => {
           try {
-               //console.log('token: ', userLoggedData?.token)
+               if (!isAllowed(window.location.pathname.replace("/", ""))) {
+                    navigate('/errors/403');
+               }
+
                const data = await controller.GetUsers();
                setUserList(data as unknown as UserData[])
+               const permissions = getPermissionList(window.location.pathname.replace("/", ""))
+               setPermissions(permissions as Permissions[])
                setLoading(false)
           } catch (err) {
                console.log('error: ', err)
@@ -98,9 +100,9 @@ const IndexUser = () => {
      const optionsBodyTemplate = () => {
           return (
                <div className="flex justify-content-end gap-2">
-                    {hasAction(ACTIONS.VIEW) && <i className="pi pi-eye" style={{ fontSize: '1.2rem', cursor: 'pointer' }}></i>}
-                    {hasAction(ACTIONS.EDIT) && <i className="pi pi-user-edit" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => setVisibleRight(true)}></i>}
-                    {hasAction(ACTIONS.DELETE) && <i className="pi pi-trash" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={deleteAlertConfirm}></i>}
+                    {permissions.length > 0 && hasAction(ACTIONS.VIEW) && <i className="pi pi-eye" style={{ fontSize: '1.2rem', cursor: 'pointer' }}></i>}
+                    {permissions.length > 0 && hasAction(ACTIONS.EDIT) && <i className="pi pi-user-edit" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => setVisibleRight(true)}></i>}
+                    {permissions.length > 0 && hasAction(ACTIONS.DELETE) && <i className="pi pi-trash" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={deleteAlertConfirm}></i>}
                </div>
           );
      }
@@ -144,8 +146,7 @@ const IndexUser = () => {
                     <span className='text-2xl'>Users</span>
                     <div className='flex justify-content-between gap-2'>
                          <div>
-
-                              {hasAction(ACTIONS.CREATE) && <Button icon="pi pi-plus" label="Nuevo"></Button>}
+                              {permissions.length > 0 && hasAction(ACTIONS.CREATE) && <Button icon="pi pi-plus" label="Nuevo"></Button>}
                          </div>
                          <div>
                               <Button icon="pi pi-external-link" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => setDialogVisible(true)} />

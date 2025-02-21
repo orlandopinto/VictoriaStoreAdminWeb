@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from "react-i18next";
 import { Form, Link, useNavigate } from 'react-router-dom';
@@ -10,10 +11,9 @@ import { AuthController } from '../../controllers/auth.controller';
 import { PermissionController } from '../../controllers/permission.controller';
 import { useAuth } from '../../hooks';
 import useLanguages from '../../hooks/useLanguages';
-import { ApiResultResponse, Language, Permissions } from '../../types';
+import { ApiResultResponse, Language, Permissions, UserDataToken } from '../../types';
 import { Validators } from '../../utils/Validators';
 import './login.css';
-import { AxiosError } from 'axios';
 
 function Login() {
 
@@ -59,7 +59,7 @@ function Login() {
                }
                const apiResultResponse = await AuthController.Login(email, password) as unknown as ApiResultResponse
                if (apiResultResponse.hasError) {
-                    const err = apiResultResponse.errorMessage
+                    const err = apiResultResponse.message
                     console.log('err: ', err)
                     if (err && err.length > 0) {
                          errorAlert(err)
@@ -68,7 +68,9 @@ function Login() {
                }
                const permissions = await getPermission(apiResultResponse.data.token) as unknown as Permissions[]
 
-               storeSessionData(apiResultResponse.data, permissions);
+               const userDataToken = apiResultResponse.data as unknown as UserDataToken
+
+               storeSessionData(userDataToken, permissions);
                navigate('/dashboard')
           } catch (error) {
                setLoading(false);
@@ -84,7 +86,7 @@ function Login() {
           try {
                const result = await new PermissionController(token).Get() as unknown as ApiResultResponse
                if (result.hasError) {
-                    const err = result.errorMessage
+                    const err = result.message
                     console.log('err: ', err)
                     if (err && err.length > 0) {
                          errorAlert(err)

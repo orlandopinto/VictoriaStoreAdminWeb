@@ -1,17 +1,21 @@
-import Footer from './Footer'
-import Navigation from './Navigation'
-import './navigation.css'
+import Footer from './Footer';
+import Navigation from './Navigation';
+import './navigation.css';
 
-const Layout = (Component: any) => ({ ...props }) => {
+interface LayoutProps {
+     children: React.ReactNode;
+}
+
+const Layout: React.FC<LayoutProps> = ({ children }) => {
      return (
           <>
                <Navigation />
                <main className='bg-layer'>
-                    <Component {...props} />
+                    {children}
                </main>
                <Footer />
           </>
-     )
-}
+     );
+};
 
-export default Layout
+export default Layout;

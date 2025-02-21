@@ -1,7 +1,3 @@
-// export type Permissions = {
-//      permissionsList: Permission[]
-// }
-
 export type Permissions = {
      actionId: string
      actionName: string

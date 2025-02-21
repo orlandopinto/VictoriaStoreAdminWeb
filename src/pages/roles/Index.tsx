@@ -1,64 +1,72 @@
 import { AxiosError } from 'axios';
+import { ProgressBar } from 'primereact/progressbar';
 import { Toast } from 'primereact/toast';
 import { Tree, TreeEventNodeEvent, TreeExpandedKeysType } from 'primereact/tree';
 import { TreeNode } from 'primereact/treenode';
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import { Button, Card, Column, confirmDialog, ConfirmDialog, DataTable, Dialog } from '../../components/primereact/index';
 import { ACTIONS } from '../../config/constants.d';
 import { ActionsController, ResoursesController, RolesController } from '../../controllers';
 import { useAuth } from "../../hooks";
 import { Actions, ApiResultResponse, Resourses, Roles } from '../../types';
+import { Permissions } from '../../types/permissions';
 import './index.css';
-import { ProgressBar } from 'primereact/progressbar';
 
 const IndexRoles = () => {
      //..:: [ VARIABLES ] ::..
-     const [resourse] = useState('roles')
+     //const { t } = useTranslation();
 
      //..:: [ HOOKS ] ::..
-     //const { t } = useTranslation();
-     const navigate = useNavigate();
      //WARNING: ..:: [ Las siguientes lineas son obligatiorias para ejecutar los permisos ]::..
-     const { userLoggedData, isAllowed, logout, hasAction, getPermissionList } = useAuth();
-     const [permissions, setPermissions] = useState([] as Permissions[])
+     const navigate = useNavigate();
+     const { getToken, logout, hasAction, getPermissionList, isAllowed } = useAuth();
+
      const [rolesNodes, setRolesNodes] = useState<TreeNode[]>([]);
      const [resoursesNodes, setResoursesNodes] = useState<TreeNode[]>([]);
      const [selectedRoleKey, setSelectedRoleKey] = useState<string>('');
      const [selectedResourseKey, setSelectedResourseKey] = useState<string>('');
      const [actionsData, setActionsData] = useState([] as Actions[])
+     const [permissions, setPermissions] = useState([] as Permissions[])
 
-     //..::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::..
+     //WARNING: ..:: [ TreeNodes ]::..
+     const [selectedActions, setSelectedActions] = useState<Actions[] | null>(null);
+     const [resoursesSelected, setResoursesSelected] = useState<string[]>([])
+
+     const [selectAll, setSelectAll] = useState<boolean>(false);
+     const [totalRecords, setTotalRecords] = useState<number>(0);
+     const toast = useRef<Toast>(null);
 
      const [loading, setLoading] = useState<boolean>(true);
      const [expandedKeys] = useState<TreeExpandedKeysType>({ '0': true });
-     //const [visibleRight, setVisibleRight] = useState<boolean>(false);
      const [dialogVisible, setDialogVisible] = useState(false);
 
+     //..::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::..
 
      useEffect(() => {
-          if (!isAllowed(resourse)) {
-               navigate('/errors/403')
-          }
-          const permissions = getPermissionList(resourse) as unknown as Permissions[];
-          setPermissions(permissions)
           getData()
-
      }, [])
 
      //..:: [ FUNCTIONS ] ::..
 
      const getData = async () => {
+          if (!isAllowed(window.location.pathname.replace("/", ""))) {
+               navigate('/errors/403');
+          }
+
           setLoading(true)
           await loadRolesData();
           await loadResoursesData();
           await loadActionsData();
+
+          const permissions = getPermissionList(window.location.pathname.replace("/", ""))
+          setPermissions(permissions as Permissions[])
           setLoading(false)
      }
 
      const loadRolesData = async () => {
           try {
-               const controller = new RolesController(userLoggedData?.token as string)
+               const controller = new RolesController(getToken())
                const data = await controller.GetRoles() as unknown as ApiResultResponse;
                const list: Roles[] = data?.data as unknown as Roles[]
                const childrenNodes: TreeNode[] = [];
@@ -92,7 +100,7 @@ const IndexRoles = () => {
 
      const loadResoursesData = async () => {
           try {
-               const controller = new ResoursesController(userLoggedData?.token as string)
+               const controller = new ResoursesController(getToken())
                const data = await controller.GetResourse() as unknown as ApiResultResponse;
                const list: Resourses[] = data?.data as unknown as Resourses[]
                const childrenNodes: TreeNode[] = [];
@@ -126,7 +134,7 @@ const IndexRoles = () => {
 
      const loadActionsData = async () => {
           try {
-               const controller = new ActionsController(userLoggedData?.token as string)
+               const controller = new ActionsController(getToken())
                const data = await controller.GetActions() as unknown as ApiResultResponse;
                const list: Actions[] = data?.data as unknown as Actions[]
                setActionsData(list);
@@ -158,13 +166,6 @@ const IndexRoles = () => {
           logout();
           // <Navigate to="/" />
      }
-
-     const [selectedActions, setSelectedActions] = useState<Actions[] | null>(null);
-     const [resoursesSelected, setResoursesSelected] = useState<string[]>([])
-
-     const [selectAll, setSelectAll] = useState<boolean>(false);
-     const [totalRecords, setTotalRecords] = useState<number>(0);
-     const toast = useRef<Toast>(null);
 
      const onActionSelectionChange = (event: any) => {
           const value = event.value;
@@ -285,7 +286,7 @@ const IndexRoles = () => {
 
      return (
           <>
-               {permissions && hasAction(ACTIONS.LIST) &&
+               {permissions.length > 0 && hasAction(ACTIONS.LIST) &&
                     (
                          <>
                               <div className='w-full pt-2 px-3 pb-2 flex justify-content-between align-items-center'>
@@ -332,4 +333,5 @@ const IndexRoles = () => {
           </>
      )
 }
+
 export default IndexRoles

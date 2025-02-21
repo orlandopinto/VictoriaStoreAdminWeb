@@ -17,8 +17,14 @@ interface Props {
 export default function SideBar({ visible, setVisible }: Props) {
      const btnRef2 = useRef<any>(null);
      const btnRef3 = useRef<any>(null);
+
+     const closeSideBar = () => {
+          setVisible(false)
+     }
+
      return (
           <Sidebar
+               closeOnEscape={true}
                visible={visible}
                onHide={() => setVisible(false)}
                content={({ hide }) => (
@@ -40,37 +46,37 @@ export default function SideBar({ visible, setVisible }: Props) {
                                                   <li>
                                                        <ul className="list-none p-0 m-0 overflow-hidden">
                                                             <li>
-                                                                 <Link to="/dashboard" className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                 <Link to="/dashboard" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
                                                                       <i className="pi pi-th-large mr-2"></i>
                                                                       <span className="font-medium">Dashboard</span>
                                                                       <Ripple />
                                                                  </Link>
                                                             </li>
                                                             <li>
-                                                                 <Link to="/taxes" className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                 <Link to="/taxes" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
                                                                       <i className="pi pi-wallet mr-2"></i>
                                                                       <span className="font-medium">Taxes</span>
                                                                       <Ripple />
                                                                  </Link>
                                                             </li>
                                                             <li>
-                                                                 <Link to="/discounts" className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                 <Link to="/discounts" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
                                                                       <i className="pi pi-wallet mr-2"></i>
                                                                       <span className="font-medium">Discounts</span>
                                                                       <Ripple />
                                                                  </Link>
                                                             </li>
                                                             <li>
-                                                                 <Link to="/users" className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                 <Link to="/users" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
                                                                       <i className="pi pi-users mr-2"></i>
                                                                       <span className="font-medium">Users</span>
                                                                       <Ripple />
                                                                  </Link>
                                                             </li>
                                                             <li>
-                                                                 <Link to="/roles" className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                 <Link to="/roles" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
                                                                       <i className="pi pi-users mr-2"></i>
-                                                                      <span className="font-medium">Roles</span>
+                                                                      <span className="font-medium">Roles and Permissions</span>
                                                                       <Ripple />
                                                                  </Link>
                                                             </li>
@@ -120,7 +126,7 @@ export default function SideBar({ visible, setVisible }: Props) {
                                                                  </ul>
                                                             </li>
                                                             <li>
-                                                                 <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                 <a onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
                                                                       <i className="pi pi-comments mr-2"></i>
                                                                       <span className="font-medium">Messages</span>
                                                                       <span className="inline-flex align-items-center justify-content-center ml-auto bg-blue-500 text-0 border-circle" style={{ minWidth: '1.5rem', height: '1.5rem' }}>
@@ -130,14 +136,14 @@ export default function SideBar({ visible, setVisible }: Props) {
                                                                  </a>
                                                             </li>
                                                             <li>
-                                                                 <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                 <a onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
                                                                       <i className="pi pi-calendar mr-2"></i>
                                                                       <span className="font-medium">Calendar</span>
                                                                       <Ripple />
                                                                  </a>
                                                             </li>
                                                             <li>
-                                                                 <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                 <a onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
                                                                       <i className="pi pi-cog mr-2"></i>
                                                                       <span className="font-medium">Settings</span>
                                                                       <Ripple />

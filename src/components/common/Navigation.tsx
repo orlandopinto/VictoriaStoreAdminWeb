@@ -20,11 +20,12 @@ const Navigation = () => {
      const { logout } = useAuth()
      const [visible, setVisible] = useState(false);
 
-     // const sidebarItemRenderer = (item: any) => (
-     //      <a className="flex align-items-center p-menuitem-link">
-     //           <span className={item.icon} />
-     //      </a>
-     // );
+     const barsItemRenderer = (item: any) => (
+          <Link to="" onClick={() => setVisible(true)} className="flex align-items-center p-menuitem-link p-3">
+               <span className={item.icon} />
+               <Ripple />
+          </Link>
+     );
 
      const dashboardItemRenderer = (item: any) => (
           <Link to="/dashboard" className="flex align-items-center p-menuitem-link p-3">
@@ -70,10 +71,7 @@ const Navigation = () => {
      const items = [
           {
                icon: 'pi pi-bars',
-               command: () => {
-                    //toast.current?.show({ severity: 'error', summary: 'Error', detail: 'No printer connected', life: 3000 });
-                    setVisible(true)
-               }
+               template: barsItemRenderer
           },
           {
                label: 'Dashboard',

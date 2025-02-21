@@ -30,7 +30,7 @@ let root = createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <PrimeReactProvider value={value}>
     <AuthProvider>
-      <RouterProvider router={AppRoutes} />
+      <RouterProvider router={AppRoutes()} />
     </AuthProvider>
   </PrimeReactProvider>
 );

@@ -26,7 +26,7 @@ function Taxes() {
      return (
           <Card>
                <div className="text-center w-full">
-                    <h1>Discount Page</h1>
+                    <h1>TAXES Page</h1>
                     <div className="flex justify-content-end gap-2">
                          <i className="pi pi-eye" style={{ fontSize: '1.2rem', cursor: 'pointer' }}></i>
                          <i className="pi pi-user-edit" style={{ fontSize: '1.2rem', cursor: 'pointer' }} ></i>
