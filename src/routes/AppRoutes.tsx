@@ -43,7 +43,7 @@ const AppRoutes = () => {
                     {
                          element: <ProtectedRoute pageName="statistics" />,
                          children: [{ path: '/statistics', element: <Layout><Statistics /></Layout > }]
-                    },
+                    }
                ],
           },
           { path: '/errors/403', element: <AccessForbidden /> },
