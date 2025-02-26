@@ -1,20 +1,21 @@
 import { AxiosError } from 'axios';
 import { Accordion, AccordionTab } from 'primereact/accordion';
+import { Divider } from 'primereact/divider';
 import { InputSwitch, InputSwitchChangeEvent } from 'primereact/inputswitch';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Message } from 'primereact/message';
-import { PickList } from 'primereact/picklist';
+import { PickList, PickListChangeEvent } from 'primereact/picklist';
 import { Stepper, StepperRefAttributes } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
 import { TabPanel, TabView } from 'primereact/tabview';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button, confirmDialog, ConfirmDialog, Dialog, InputText, InputTextProps } from '../../components/primereact/index';
+import { Navigate } from 'react-router-dom';
+import { Button, confirmDialog, ConfirmDialog, Dialog, InputText } from '../../components/primereact/index';
 import { ACTIONS } from '../../config/constants.d';
+import { PermissionsByRoleProvider, usePermissionsByRoleContext } from '../../context/PermissionsByRoleContext';
 import { ActionsController, ResoursesController, RolesController, UserController } from '../../controllers';
 import { useAuth } from "../../hooks";
-import { Actions, ApiResultResponse, Resourses, Roles, UserData } from '../../types';
-import { Permissions } from '../../types/permissions';
+import { Actions, ActionsSelected, ApiResultResponse, NewRole, PermissionsByRole, Resourses, Roles, UserData } from '../../types';
 import RolesDatatable from './components/RolesDatatable';
 import UsersDataTable from './components/UsersDataTable';
 import './index.css';
@@ -25,7 +26,7 @@ const IndexRoles = () => {
 
      //..:: [ HOOKS ] ::..
      //WARNING: ..:: [ Las siguientes lineas son obligatiorias para ejecutar los permisos ]::..
-     const navigate = useNavigate();
+     //const navigate = useNavigate();
      const { getToken, logout, hasAction, getPermissionList, isAllowed } = useAuth();
      const [userList, setUserList] = useState<UserData[]>([])
      const [visibleRight, setVisibleRight] = useState<boolean>(false);
@@ -35,7 +36,7 @@ const IndexRoles = () => {
      const [rolesData, setRolesData] = useState([] as Roles[])
      const [resoursesData, setResoursesData] = useState([] as Resourses[])
      const [actionsData, setActionsData] = useState([] as Actions[])
-     const [permissions, setPermissions] = useState([] as Permissions[])
+     const [permissionsByRole, setPermissionsByRole] = useState([] as PermissionsByRole[])
      const [loading, setLoading] = useState<boolean>(true);
 
      const [tabActiveIndex, setTabActiveIndex] = useState<number>(0);
@@ -52,7 +53,7 @@ const IndexRoles = () => {
 
      const getData = async () => {
           if (!isAllowed(window.location.pathname.replace("/", ""))) {
-               navigate('/errors/403');
+               <Navigate to='/errors/403' />
           }
 
           setLoading(true)
@@ -61,8 +62,8 @@ const IndexRoles = () => {
           await loadResoursesData();
           await loadActionsData();
 
-          const permissions = getPermissionList(window.location.pathname.replace("/", ""))
-          setPermissions(permissions as Permissions[])
+          const permissionsByRole = getPermissionList(window.location.pathname.replace("/", ""))
+          setPermissionsByRole(permissionsByRole as PermissionsByRole[])
           setLoading(false)
      }
 
@@ -149,19 +150,19 @@ const IndexRoles = () => {
      }
 
      const UsersPickList = () => {
-          const [sourceUserList, setUserListSource] = useState<UserData[]>([]);
-          const [targetUserList, setTargetUserList] = useState<UserData[]>([]);
+          const [source, setSource] = useState<UserData[]>([]);
+          const [target, setTarget] = useState<UserData[]>([]);
+
           useEffect(() => {
-               setUserListSource(userList)
+               setSource(userList)
           }, [])
 
-          const onListUsersChange = (event: any) => {
-               setUserListSource(event.source);
-               setTargetUserList(event.target);
+          const onChange = (event: PickListChangeEvent) => {
+               setSource(event.source);
+               setTarget(event.target);
           };
 
-
-          const pickItemTemplate = (item: UserData) => {
+          const itemTemplate = (item: UserData) => {
                return (
                     <div className="flex flex-wrap p-2 align-items-center gap-3">
                          <img className="w-4rem shadow-2 flex-shrink-0 border-round" src={"https://primefaces.org/cdn/primereact/images/product/bamboo-watch.jpg"} alt={item.email} />
@@ -177,31 +178,26 @@ const IndexRoles = () => {
           };
 
           return (
-               <PickList dataKey="id" className="p-3" source={sourceUserList} target={targetUserList} onChange={onListUsersChange} itemTemplate={pickItemTemplate}
+               <PickList dataKey="_id" className="p-3" source={source} target={target} onChange={onChange} itemTemplate={itemTemplate}
                     sourceHeader="Available" targetHeader="Selected" sourceStyle={{ height: '24rem' }} targetStyle={{ height: '24rem' }} />
           )
      }
 
-     //Stepper / Wizard
-     const RolesStepper = () => {
+     const contentMessage = (
+          <div className="flex align-items-center">
+               <div className="ml-2">PermissionsByRole take effect near real time.</div>
+          </div>
+     );
 
-          const inputRef = useRef<HTMLInputElement | null>(null);
+     const stepperRef = useRef<StepperRefAttributes>(null);
+
+     const NewRoleContent = () => {
+          const { dispatch } = usePermissionsByRoleContext();
+          const inputTextRef = useRef<HTMLInputElement | null>(null);
           const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
-
-          type NewRole = {
-               id?: string,
-               roleName: string,
-               roleDescription?: string
-          }
-
+          const [showRoleNameMessage, setShowRoleNameMessage] = useState(false)
           const [formData, setFormData] = useState<NewRole>({} as NewRole);
-
-          const stepperRef = useRef<StepperRefAttributes>(null);
-          const contentMessage = (
-               <div className="flex align-items-center">
-                    <div className="ml-2">Permissions take effect near real time.</div>
-               </div>
-          );
+          const [visible, setVisible] = useState<boolean>(false);
 
           const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
                setFormData({
@@ -217,103 +213,87 @@ const IndexRoles = () => {
                });
           };
 
-          return (
+          const validateRole = () => {
+               if (rolesData.find(f => f.roleName === formData.roleName)) {
+                    setVisible(true);
+                    return;
+               }
+               else if (!formData.roleName) {
+                    inputTextRef.current?.focus();
+                    setShowRoleNameMessage(true);
+                    setTimeout(() => {
+                         setShowRoleNameMessage(false);
+                    }, 3000);
+                    return;
+               }
+               dispatch({ type: 'ADD_ROLE', payload: { roleName: formData.roleName, roleDescription: formData.roleDescription } });
+               stepperRef.current?.nextCallback()
+          }
 
-               <Stepper ref={stepperRef} linear={true} activeStep={0}>
-                    <StepperPanel header="Overview" >
-                         <div className="roles-stepper-container flex flex-column h-max">
-                              <div className="gap-2 p-3 flex-auto flex flex-column justify-content-start font-medium">
-                                   <div className='pb-2'>
-                                        <span className='text-3xl'>Overview</span>
-                                   </div>
-                                   <div className="flex flex-column gap-2">
-                                        <label htmlFor="username">Name</label>
-                                        <InputText
-                                             className='p-inputtext-sm'
-                                             id="roleName"
-                                             style={{ width: '250px' }}
-                                             ref={inputRef}
-                                             name="roleName"
-                                             value={formData.roleName}
-                                             onChange={handleChange}
-                                             required
-                                        />
-                                   </div>
-                                   <div className="flex flex-column gap-2 pb-5">
-                                        <label htmlFor="username">Description</label>
-                                        <InputTextarea
-                                             rows={10}
-                                             cols={5}
-                                             id="roleDescription"
-                                             ref={textAreaRef}
-                                             name="roleDescription"
-                                             value={formData.roleDescription}
-                                             onChange={handleTextAreaChange}
-                                        />
-                                   </div>
-
+          return (<div className="roles-stepper-container flex flex-column h-max">
+               <div className="gap-2 p-3 flex-auto flex flex-column justify-content-start font-medium">
+                    <div className='pb-2'>
+                         <span className='text-3xl'>Overview</span>
+                    </div>
+                    <div>
+                         <label>Name</label>
+                    </div>
+                    <div className="flex flex-row">
+                         <div>
+                              <InputText
+                                   className='p-inputtext-sm'
+                                   id="roleName"
+                                   style={{ width: '250px' }}
+                                   ref={inputTextRef}
+                                   name="roleName"
+                                   value={formData.roleName}
+                                   onChange={handleChange}
+                                   required
+                              />
+                         </div>
+                         {showRoleNameMessage &&
+                              <div className='pl-2'>
+                                   <Message severity="error" text="Role name is required" style={{ padding: '.5rem 1rem' }} />
                               </div>
-                         </div>
-                         <div className="flex pt-4 justify-content-end gap-2">
-                              <Button label="Cancel" outlined severity="secondary" icon="pi pi-times" onClick={() => setStepperDialogVisible(false)} />
-                              <Button label="Siguiente" outlined icon="pi pi-arrow-right" iconPos="right" onClick={() => {
-                                   if (!formData.roleName) {
-                                        console.log('first name is required')
-                                        return
-                                   }
-                                   stepperRef.current?.nextCallback()
-                              }
-                              } />
-                         </div>
-                    </StepperPanel>
-                    <StepperPanel header="Permissions">
-                         <div className="roles-stepper-container flex flex-column ">
-                              <div className="gap-2 p-3 flex-auto flex flex-column justify-content-start font-medium">
-                                   <div>
-                                        <div>
-                                             <Message style={{ border: 'solid #696cff', borderWidth: '0 0 0 6px', color: '#696cff' }} className="border-primary w-full justify-content-start" severity="info" content={contentMessage} />
-                                        </div>
-                                        <div>
-                                             <ResoursesAccordion />
-                                        </div>
-                                   </div>
-                              </div>
-                         </div>
-                         <div className="flex pt-4 justify-content-end gap-2">
-                              <Button label="Atras" outlined severity="secondary" icon="pi pi-arrow-left" onClick={() => stepperRef.current?.prevCallback()} />
-                              <Button label="Siguiente" outlined icon="pi pi-arrow-right" iconPos="right" onClick={() => stepperRef.current?.nextCallback()} />
-                         </div>
-                    </StepperPanel>
-                    <StepperPanel header="Users">
-                         <div className="roles-stepper-container">
+                         }
+                    </div>
+                    <div className="flex flex-column gap-2">
+                         <label>Description</label>
+                         <InputTextarea
+                              rows={26}
+                              cols={5}
+                              id="roleDescription"
+                              ref={textAreaRef}
+                              name="roleDescription"
+                              value={formData.roleDescription}
+                              onChange={handleTextAreaChange}
+                         />
+                    </div>
+                    <div style={{ display: 'none' }}>
+                         <Button id="btnValidateRole" label="boton oculto" onClick={() => validateRole()} />
+                    </div>
+                    <Dialog header="Error" style={{ width: '25%' }} visible={visible} onHide={() => { if (!visible) return; setVisible(false); }}>
+                         <div className='flex align-items-center gap-3'>
                               <div>
-                                   <div><span>role Name: </span>{formData.roleName}</div>
-                                   <div><span>role Description: </span>{formData.roleDescription}</div>
+                                   <i className='pi pi-question-circle' style={{ fontSize: '4rem', color: 'var( --red-400)' }}></i>
                               </div>
-
-                              <UsersPickList />
+                              <div>
+                                   <p className="">
+                                        Role name already exists
+                                   </p>
+                              </div>
                          </div>
-                         <div className="flex pt-4 justify-content-end gap-2">
-                              <Button label="Atras" outlined severity="secondary" icon="pi pi-arrow-left" onClick={() => stepperRef.current?.prevCallback()} />
-                              <Button label="Finish" outlined icon="pi pi-times" onClick={() => setStepperDialogVisible(false)} />
+                         <div className="flex flex-wrap justify-content-end pt-3">
+                              <Button iconPos='left' label="Aceptar" icon="pi pi-check" onClick={() => setVisible(false)} />
                          </div>
-                    </StepperPanel>
-               </Stepper>
+                    </Dialog>
+               </div>
+          </div>
           )
      }
 
-     type ActionsSelected = {
-          checked: boolean
-          id: string
-          actionId: string
-          actionName: string
-          resourseId: string
-          resourseName: string
-          roleId: string | null
-          roleName: string | null
-     }
-
      const ResoursesAccordion = () => {
+          const { state, dispatch } = usePermissionsByRoleContext();
           const [mainCheckboxState, setMainCheckboxState] = useState<Record<string, boolean>>({});
           const [checkboxState, setCheckboxState] = useState<Record<string, boolean>>({});
           const [actionsSelected, setActionsSelected] = useState<ActionsSelected[]>([]);
@@ -362,8 +342,11 @@ const IndexRoles = () => {
                          setActionsSelected(newActionsSelected);
                     }
                }
-               console.clear();
-               console.table(newActionsSelected)
+               //console.clear();
+               //console.table(newActionsSelected)
+               dispatch({ type: "CLEAR_ACTIONS_SELECTED" });
+               dispatch({ type: "SET_ACTIONS_SELECTED", payload: newActionsSelected });
+               console.log('state: ', state)
           };
 
           const selectAllActionsByResourse = (isChecked: boolean, resourse: Resourses) => {
@@ -379,7 +362,7 @@ const IndexRoles = () => {
                               actionName: action.actionName,
                               resourseId: resourse._id,
                               roleId: null,
-                              roleName: null
+                              roleName: null//roleName
                          })
                          setActionsSelected(newActionsSelected);
                          let currentActionSelected: ActionsSelected = {
@@ -390,7 +373,7 @@ const IndexRoles = () => {
                               actionName: action.actionName,
                               resourseId: resourse._id,
                               roleId: null,
-                              roleName: null
+                              roleName: null//roleName
                          }
                          setCheckboxState((prevState) => ({
                               ...prevState,
@@ -409,7 +392,7 @@ const IndexRoles = () => {
                               actionName: action.actionName,
                               resourseId: resourse._id,
                               roleId: null,
-                              roleName: null
+                              roleName: null//roleName
                          }
                          setCheckboxState((prevState) => ({
                               ...prevState,
@@ -420,11 +403,14 @@ const IndexRoles = () => {
                     setActionsSelected(newActionsSelected);
                }
 
-               console.clear();
-               console.table(newActionsSelected);
+               //console.clear();
+               //console.table(newActionsSelected);
+               dispatch({ type: "CLEAR_ACTIONS_SELECTED" });
+               dispatch({ type: "SET_ACTIONS_SELECTED", payload: newActionsSelected });
+               console.log('state: ', state)
           }
 
-          const tabs = () => {
+          const accordionTabs = () => {
                return resoursesData.map((resourse, index) => (
                     <AccordionTab
                          key={index}
@@ -478,8 +464,108 @@ const IndexRoles = () => {
 
           return (
                <Accordion multiple key={1000} activeIndex={[0]} className='pt-3 resourse-accordion-header'>
-                    {tabs()}
+                    {accordionTabs()}
                </Accordion>
+          )
+     }
+
+     const Review = () => {
+          const { state } = usePermissionsByRoleContext();
+
+          return (
+               <div style={{ height: '42rem' }}>
+                    <div className="flex gap-2">
+                         <div><span>Role:</span></div>
+                         <div><span>{state.newRole.roleName}</span></div>
+                    </div>
+                    <div className="flex gap-2">
+                         <div><span>Role Description:</span></div>
+                         <div><span>{state.newRole.roleDescription}</span></div>
+                    </div>
+                    <Divider />
+                    <div className="">
+                         {state.actionListSelected &&
+                              state.actionListSelected.length > 0 &&
+                              state.actionListSelected.map((action, index) => {
+                                   return (
+                                        <div key={action.id || index}>
+                                             <div>{action.actionId}</div>
+                                             <div>{action.actionName}</div>
+                                        </div>
+                                   );
+                              })}
+                         {state.actionListSelected && state.actionListSelected.length === 0 && (
+                              <div>No actions selected.</div>
+                         )}
+                    </div>
+               </div>
+          )
+     }
+
+     const nextCallback = () => {
+          let btn = document.getElementById('btnValidateRole') as HTMLButtonElement
+          btn.click();
+     }
+
+     //Stepper / Wizard
+     const RolesStepper = () => {
+          return (
+               <PermissionsByRoleProvider>
+                    <Stepper ref={stepperRef} linear={true} activeStep={0}>
+                         <StepperPanel header="Overview" >
+                              <div style={{ overflow: 'auto', height: '44.9rem' }}>
+                                   <NewRoleContent />
+                              </div>
+
+                              <div className="flex pt-4 justify-content-end gap-2">
+                                   <Button label="Cancel" outlined severity="secondary" icon="pi pi-times" onClick={() => setStepperDialogVisible(false)} />
+                                   <Button label="Siguiente" outlined icon="pi pi-arrow-right" iconPos="right" onClick={() => nextCallback()} />
+                              </div>
+                         </StepperPanel>
+                         <StepperPanel header="PermissionsByRole">
+                              <div style={{ overflow: 'auto', height: '44.9rem' }}>
+                                   <div className="roles-stepper-container flex flex-column ">
+                                        <div className="gap-2 p-3 flex-auto flex flex-column justify-content-start font-medium">
+                                             <div>
+                                                  <div>
+                                                       <Message style={{ border: 'solid #696cff', borderWidth: '0 0 0 6px', color: '#696cff' }} className="border-primary w-full justify-content-start" severity="info" content={contentMessage} />
+                                                  </div>
+                                                  <div>
+                                                       <ResoursesAccordion />
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                              <div className="flex pt-4 justify-content-end gap-2">
+                                   <Button label="Atras" outlined severity="secondary" icon="pi pi-arrow-left" onClick={() => stepperRef.current?.prevCallback()} />
+                                   <Button label="Siguiente" outlined icon="pi pi-arrow-right" iconPos="right" onClick={() => stepperRef.current?.nextCallback()} />
+                              </div>
+                         </StepperPanel>
+                         <StepperPanel header="Users">
+                              <div style={{ overflow: 'auto', height: '44.9rem' }}>
+                                   <div className="roles-stepper-container">
+                                        <UsersPickList />
+                                   </div>
+                              </div>
+                              <div className="flex pt-4 justify-content-end gap-2">
+                                   <Button label="Atras" outlined severity="secondary" icon="pi pi-arrow-left" onClick={() => stepperRef.current?.prevCallback()} />
+                                   <Button label="Siguiente" outlined icon="pi pi-arrow-right" iconPos="right" onClick={() => stepperRef.current?.nextCallback()} />
+                              </div>
+                         </StepperPanel>
+                         <StepperPanel header="Review">
+                              <div style={{ overflow: 'auto', height: '44.9rem' }}>
+                                   <div className="roles-stepper-container">
+                                        <Review />
+                                   </div>
+                              </div>
+                              <div className="flex pt-4 justify-content-end gap-2">
+                                   <Button label="Atras" outlined severity="secondary" icon="pi pi-arrow-left" onClick={() => stepperRef.current?.prevCallback()} />
+                                   <Button label="Finish" outlined icon="pi pi-times" onClick={() => setStepperDialogVisible(false)} />
+                              </div>
+                         </StepperPanel>
+                    </Stepper>
+               </PermissionsByRoleProvider>
           )
      }
 
@@ -488,10 +574,10 @@ const IndexRoles = () => {
                <>
                     <TabView className='roles-tab-view' activeIndex={tabActiveIndex} onTabChange={(e) => setTabActiveIndex(e.index)}>
                          <TabPanel header="Users" leftIcon="pi pi-users mr-2">
-                              <UsersDataTable userList={userList} permissions={permissions} loading={loading} setVisibleRight={setVisibleRight} />
+                              <UsersDataTable userList={userList} permissionsByRole={permissionsByRole} loading={loading} setVisibleRight={setVisibleRight} />
                          </TabPanel>
                          <TabPanel header="Roles" rightIcon="pi pi-lock ml-2">
-                              <RolesDatatable rolesData={rolesData} permissions={permissions} loading={loading} setVisibleRight={setVisibleRight} setStepperDialogVisible={setStepperDialogVisible} />
+                              <RolesDatatable rolesData={rolesData} permissionsByRole={permissionsByRole} loading={loading} setVisibleRight={setVisibleRight} setStepperDialogVisible={setStepperDialogVisible} />
                          </TabPanel>
                          <TabPanel header="Pages" leftIcon="pi pi-clone mr-2">
                               AQUI COMPONENTE PARA MOSTRAR Y AGREGAR RESOURSES
@@ -514,7 +600,7 @@ const IndexRoles = () => {
 
      return (
           <>
-               {permissions.length > 0 && hasAction(ACTIONS.LIST) &&
+               {permissionsByRole.length > 0 && hasAction(ACTIONS.LIST) &&
                     (
                          <>
                               <div className='w-full my-2 px-2 pb-2 flex justify-content-between align-items-center'>

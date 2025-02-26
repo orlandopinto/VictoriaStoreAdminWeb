@@ -8,8 +8,8 @@ import { Button, Card, Column, confirmDialog, ConfirmDialog, DataTable, DataTabl
 import { ACTIONS } from '../../config/constants.d';
 import { UserController } from "../../controllers/user.controller";
 import { useAuth } from "../../hooks";
-import { UserData } from "../../types";
-import { Permissions } from '../../types/permissions';
+import { PermissionsByRole, UserData } from "../../types";
+
 import "./index.css";
 
 const IndexUser = () => {
@@ -34,7 +34,7 @@ const IndexUser = () => {
      const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
      const [visibleRight, setVisibleRight] = useState<boolean>(false);
      const [dialogVisible, setDialogVisible] = useState(false);
-     const [permissions, setPermissions] = useState([] as Permissions[])
+     const [permissionsByRole, setPermissionsByRole] = useState([] as PermissionsByRole[])
 
      const [filters, setFilters] = useState<DataTableFilterMeta>({
           global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -55,8 +55,8 @@ const IndexUser = () => {
 
                const data = await controller.GetUsers();
                setUserList(data as unknown as UserData[])
-               const permissions = getPermissionList(window.location.pathname.replace("/", ""))
-               setPermissions(permissions as Permissions[])
+               const permissionsByRole = getPermissionList(window.location.pathname.replace("/", ""))
+               setPermissionsByRole(permissionsByRole as PermissionsByRole[])
                setLoading(false)
           } catch (err) {
                console.log('error: ', err)
@@ -100,9 +100,9 @@ const IndexUser = () => {
      const optionsBodyTemplate = () => {
           return (
                <div className="flex justify-content-end gap-2">
-                    {permissions.length > 0 && hasAction(ACTIONS.VIEW) && <i className="pi pi-eye" style={{ fontSize: '1.2rem', cursor: 'pointer' }}></i>}
-                    {permissions.length > 0 && hasAction(ACTIONS.EDIT) && <i className="pi pi-user-edit" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => setVisibleRight(true)}></i>}
-                    {permissions.length > 0 && hasAction(ACTIONS.DELETE) && <i className="pi pi-trash" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={deleteAlertConfirm}></i>}
+                    {permissionsByRole.length > 0 && hasAction(ACTIONS.VIEW) && <i className="pi pi-eye" style={{ fontSize: '1.2rem', cursor: 'pointer' }}></i>}
+                    {permissionsByRole.length > 0 && hasAction(ACTIONS.EDIT) && <i className="pi pi-user-edit" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => setVisibleRight(true)}></i>}
+                    {permissionsByRole.length > 0 && hasAction(ACTIONS.DELETE) && <i className="pi pi-trash" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={deleteAlertConfirm}></i>}
                </div>
           );
      }
@@ -146,7 +146,7 @@ const IndexUser = () => {
                     <span className='text-2xl'>Users</span>
                     <div className='flex justify-content-between gap-2'>
                          <div>
-                              {permissions.length > 0 && hasAction(ACTIONS.CREATE) && <Button icon="pi pi-plus" label="Nuevo"></Button>}
+                              {permissionsByRole.length > 0 && hasAction(ACTIONS.CREATE) && <Button icon="pi pi-plus" label="Nuevo"></Button>}
                          </div>
                          <div>
                               <Button icon="pi pi-external-link" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => setDialogVisible(true)} />

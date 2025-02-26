@@ -1,4 +1,4 @@
-export type Permissions = {
+export type PermissionsByRole = {
      actionId: string
      actionName: string
      id: string
@@ -10,7 +10,7 @@ export type Permissions = {
 }
 
 
-export type PermissionsDTO = {
+export type PermissionsByRoleDTO = {
      actionId: string
      actionName: string
      id: string

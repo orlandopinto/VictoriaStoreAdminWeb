@@ -11,7 +11,7 @@ import { AuthController } from '../../controllers/auth.controller';
 import { PermissionController } from '../../controllers/permission.controller';
 import { useAuth } from '../../hooks';
 import useLanguages from '../../hooks/useLanguages';
-import { ApiResultResponse, Language, Permissions, UserDataToken } from '../../types';
+import { ApiResultResponse, Language, PermissionsByRole, UserDataToken } from '../../types';
 import { Validators } from '../../utils/Validators';
 import './login.css';
 
@@ -66,11 +66,11 @@ function Login() {
                     }
                     return
                }
-               const permissions = await getPermission(apiResultResponse.data.token) as unknown as Permissions[]
+               const permissionsByRole = await getPermission(apiResultResponse.data.token) as unknown as PermissionsByRole[]
 
                const userDataToken = apiResultResponse.data as unknown as UserDataToken
 
-               storeSessionData(userDataToken, permissions);
+               storeSessionData(userDataToken, permissionsByRole);
                navigate('/dashboard')
           } catch (error) {
                setLoading(false);
@@ -82,7 +82,7 @@ function Login() {
           }
      }
 
-     const getPermission = async (token: string): Promise<Permissions[]> => {
+     const getPermission = async (token: string): Promise<PermissionsByRole[]> => {
           try {
                const result = await new PermissionController(token).Get() as unknown as ApiResultResponse
                if (result.hasError) {
@@ -92,12 +92,12 @@ function Login() {
                          errorAlert(err)
                     }
                }
-               return result.data as unknown as Permissions[]
+               return result.data as unknown as PermissionsByRole[]
           } catch (error) {
                const handledError = (error as AxiosError).response?.data as Record<string, string>
                errorAlert(handledError.error)
           }
-          return [] as unknown as Permissions[]
+          return [] as unknown as PermissionsByRole[]
      }
 
      const errorAlert = (message: string) => {

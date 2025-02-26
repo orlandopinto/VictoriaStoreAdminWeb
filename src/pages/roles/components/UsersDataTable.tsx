@@ -7,19 +7,19 @@ import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { Dispatch, SetStateAction, useState } from "react";
 import { ACTIONS } from "../../../config/constants.d";
-import { Permissions, UserData } from "../../../types";
+import { PermissionsByRole, UserData } from "../../../types";
 import { useAuth } from "../../../hooks";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Button } from "primereact/button";
 
 interface Props {
      userList: UserData[];
-     permissions: Permissions[];
+     permissionsByRole: PermissionsByRole[];
      loading: boolean;
      setVisibleRight: Dispatch<SetStateAction<boolean>>
 }
 
-const UsersDataTable = ({ userList, permissions, loading, setVisibleRight }: Props) => {
+const UsersDataTable = ({ userList, permissionsByRole, loading, setVisibleRight }: Props) => {
 
      const { hasAction } = useAuth();
 
@@ -69,9 +69,9 @@ const UsersDataTable = ({ userList, permissions, loading, setVisibleRight }: Pro
      const optionsBodyTemplate = () => {
           return (
                <div className="flex justify-content-end gap-2">
-                    {permissions.length > 0 && hasAction(ACTIONS.VIEW) && <i className="pi pi-eye" style={{ fontSize: '1.2rem', cursor: 'pointer' }}></i>}
-                    {permissions.length > 0 && hasAction(ACTIONS.EDIT) && <i className="pi pi-user-edit" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => setVisibleRight(true)}></i>}
-                    {permissions.length > 0 && hasAction(ACTIONS.DELETE) && <i className="pi pi-trash" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={deleteAlertConfirm}></i>}
+                    {permissionsByRole.length > 0 && hasAction(ACTIONS.VIEW) && <i className="pi pi-eye" style={{ fontSize: '1.2rem', cursor: 'pointer' }}></i>}
+                    {permissionsByRole.length > 0 && hasAction(ACTIONS.EDIT) && <i className="pi pi-user-edit" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => setVisibleRight(true)}></i>}
+                    {permissionsByRole.length > 0 && hasAction(ACTIONS.DELETE) && <i className="pi pi-trash" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={deleteAlertConfirm}></i>}
                </div>
           );
      }

@@ -7,19 +7,19 @@ import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { Dispatch, SetStateAction, useState } from "react";
 import { ACTIONS } from "../../../config/constants.d";
-import { Roles, Permissions } from "../../../types";
+import { PermissionsByRole, Roles } from "../../../types";
 import { useAuth } from "../../../hooks";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
 interface Props {
      rolesData: Roles[];
-     permissions: Permissions[];
+     permissionsByRole: PermissionsByRole[];
      loading: boolean;
      setVisibleRight: Dispatch<SetStateAction<boolean>>;
      setStepperDialogVisible: Dispatch<SetStateAction<boolean>>;
 }
 
-const RolesDatatable = ({ rolesData, permissions, loading, setVisibleRight, setStepperDialogVisible }: Props) => {
+const RolesDatatable = ({ rolesData, permissionsByRole, loading, setVisibleRight, setStepperDialogVisible }: Props) => {
 
      const { hasAction } = useAuth();
 
@@ -59,8 +59,8 @@ const RolesDatatable = ({ rolesData, permissions, loading, setVisibleRight, setS
      const rolesOptionsBodyTemplate = () => {
           return (
                <div className="flex justify-content-end gap-2">
-                    {permissions.length > 0 && hasAction(ACTIONS.EDIT) && <i className="pi pi-pencil" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => setVisibleRight(true)}></i>}
-                    {permissions.length > 0 && hasAction(ACTIONS.DELETE) && <i className="pi pi-trash" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={deleteAlertConfirm}></i>}
+                    {permissionsByRole.length > 0 && hasAction(ACTIONS.EDIT) && <i className="pi pi-pencil" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => setVisibleRight(true)}></i>}
+                    {permissionsByRole.length > 0 && hasAction(ACTIONS.DELETE) && <i className="pi pi-trash" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={deleteAlertConfirm}></i>}
                </div>
           );
      }
