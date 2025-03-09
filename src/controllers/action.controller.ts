@@ -1,7 +1,7 @@
-import { RESOURSES_ENDPOINT } from "../config/constants.d";
+import { ACTIONS_ENDPOINT } from "../config/constants.d";
 import AppService from "../services/AppService";
 
-export class ResoursesController {
+export class ActionController {
 
      token: string
 
@@ -9,8 +9,8 @@ export class ResoursesController {
           this.token = token as string;
      }
 
-     public GetResourse = async (): Promise<string | undefined> => {
-          const service = new AppService(this.token, RESOURSES_ENDPOINT);
+     public GetActions = async (): Promise<string | undefined> => {
+          const service = new AppService(this.token, ACTIONS_ENDPOINT);
           try {
                const data = await service.Get()
                     .catch(error => {

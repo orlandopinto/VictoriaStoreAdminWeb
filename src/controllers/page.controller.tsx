@@ -1,7 +1,7 @@
-import { ACTIONS_ENDPOINT } from "../config/constants.d";
+import { PAGES_ENDPOINT } from "../config/constants.d";
 import AppService from "../services/AppService";
 
-export class ActionsController {
+export class PageController {
 
      token: string
 
@@ -9,8 +9,8 @@ export class ActionsController {
           this.token = token as string;
      }
 
-     public GetActions = async (): Promise<string | undefined> => {
-          const service = new AppService(this.token, ACTIONS_ENDPOINT);
+     public GetPages = async (): Promise<string | undefined> => {
+          const service = new AppService(this.token, PAGES_ENDPOINT);
           try {
                const data = await service.Get()
                     .catch(error => {

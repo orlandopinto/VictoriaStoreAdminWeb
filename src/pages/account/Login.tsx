@@ -11,7 +11,7 @@ import { AuthController } from '../../controllers/auth.controller';
 import { PermissionController } from '../../controllers/permission.controller';
 import { useAuth } from '../../hooks';
 import useLanguages from '../../hooks/useLanguages';
-import { ApiResultResponse, Language, PermissionsByRole, UserDataToken } from '../../types';
+import { ApiResultResponse, Language, PermissionsProfile, UserDataToken } from '../../types';
 import { Validators } from '../../utils/Validators';
 import './login.css';
 
@@ -66,7 +66,7 @@ function Login() {
                     }
                     return
                }
-               const permissionsByRole = await getPermission(apiResultResponse.data.token) as unknown as PermissionsByRole[]
+               const permissionsByRole = await getPermission(apiResultResponse.data.token) as unknown as PermissionsProfile[]
 
                const userDataToken = apiResultResponse.data as unknown as UserDataToken
 
@@ -82,7 +82,7 @@ function Login() {
           }
      }
 
-     const getPermission = async (token: string): Promise<PermissionsByRole[]> => {
+     const getPermission = async (token: string): Promise<PermissionsProfile[]> => {
           try {
                const result = await new PermissionController(token).Get() as unknown as ApiResultResponse
                if (result.hasError) {
@@ -92,12 +92,12 @@ function Login() {
                          errorAlert(err)
                     }
                }
-               return result.data as unknown as PermissionsByRole[]
+               return result.data as unknown as PermissionsProfile[]
           } catch (error) {
                const handledError = (error as AxiosError).response?.data as Record<string, string>
                errorAlert(handledError.error)
           }
-          return [] as unknown as PermissionsByRole[]
+          return [] as unknown as PermissionsProfile[]
      }
 
      const errorAlert = (message: string) => {

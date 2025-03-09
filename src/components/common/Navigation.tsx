@@ -7,7 +7,6 @@ import { Ripple } from 'primereact/ripple';
 import { Toast } from 'primereact/toast';
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import foto from '../../assets/images/Orlando.png';
 import logo from '../../assets/svg/logo.svg';
 import { useAuth } from '../../hooks';
 import SwitchLanguages from './LanguageSwitcher';
@@ -17,7 +16,7 @@ import ThemeSelection from './ThemeSelection';
 
 const Navigation = () => {
      const toast = useRef(null);
-     const { logout } = useAuth()
+     const { logout, userLoggedData } = useAuth()
      const [visible, setVisible] = useState(false);
 
      const barsItemRenderer = (item: any) => (
@@ -141,14 +140,14 @@ const Navigation = () => {
           <div className='text-center pt-2 gap'>
                <div>
                     <Avatar
-                         image={foto}
+                         image={userLoggedData?.userData.imageProfilePath}
                          id="avatarFoto"
                          shape="circle"
                          style={{ width: 70, height: 70 }}
                     />
                </div>
-               <h5 className='my-1'>Orlando Pinto</h5>
-               <p style={{ fontSize: '.8rem' }}>Adminstrador</p>
+               <h5 className='my-1'>{`${userLoggedData?.userData.firstName} ${userLoggedData?.userData.lastName}`}</h5>
+               <p style={{ fontSize: '.8rem' }}>{userLoggedData?.userData.roles[0]}</p>
                <Divider />
           </div>
      );
@@ -218,7 +217,7 @@ const Navigation = () => {
                <div className="flex justify-content-center">
                     <Menu model={menuItemsProfile} popup ref={menuLeft} id="popup-avatar-profile" />
                     <Avatar
-                         image={foto}
+                         image={userLoggedData?.userData.imageProfilePath}
                          id="avatar"
                          shape="circle"
                          label="Show Left"

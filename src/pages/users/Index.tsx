@@ -1,15 +1,13 @@
 import { AxiosError } from 'axios';
-import { FilterMatchMode } from "primereact/api";
 import { Sidebar } from "primereact/sidebar";
-import { Tag } from 'primereact/tag';
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { Button, Card, Column, confirmDialog, ConfirmDialog, DataTable, DataTableFilterMeta, Dialog, IconField, InputIcon, InputText } from '../../components/primereact/index';
+import { Button, Card, confirmDialog, ConfirmDialog, Dialog } from '../../components/primereact/index';
 import { ACTIONS } from '../../config/constants.d';
 import { UserController } from "../../controllers/user.controller";
 import { useAuth } from "../../hooks";
 import { PermissionsByRole, UserData } from "../../types";
-
+import UsersDataTable from '../roles/components/UsersDataTable';
 import "./index.css";
 
 const IndexUser = () => {
@@ -29,21 +27,11 @@ const IndexUser = () => {
 
      //..:: [ HOOKS ] ::..
      //const { t } = useTranslation();
-     const [userList, setUserList] = useState<UserData[]>([])
-     const [loading, setLoading] = useState<boolean>(true);
-     const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
+     const [, setUserList] = useState<UserData[]>([])
+     const [, setLoading] = useState<boolean>(true);
      const [visibleRight, setVisibleRight] = useState<boolean>(false);
      const [dialogVisible, setDialogVisible] = useState(false);
      const [permissionsByRole, setPermissionsByRole] = useState([] as PermissionsByRole[])
-
-     const [filters, setFilters] = useState<DataTableFilterMeta>({
-          global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-          'email': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-          representative: { value: null, matchMode: FilterMatchMode.IN },
-          status: { value: null, matchMode: FilterMatchMode.EQUALS },
-          verified: { value: null, matchMode: FilterMatchMode.EQUALS }
-     });
 
      //..:: [ FUNCTIONS ] ::..
 
@@ -68,60 +56,21 @@ const IndexUser = () => {
           }
      }
 
-     const rolesBodyTemplate = (user: any) => {
-          let ctrls: any[] = [];
-          user.roles.map((it: any, index: number) => {
-               ctrls.push(<Tag key={index} className='mr-1'>{it}</Tag>)
-          })
-
-          return ctrls
-     };
-
-     const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-          const value = e.target.value;
-          let _filters = { ...filters };
-          // @ts-ignore
-          _filters['global'].value = value;
-          setFilters(_filters);
-          setGlobalFilterValue(value);
-     };
-
-     const renderHeader = () => {
-          return (
-               <div className="flex justify-content-end">
-                    <IconField iconPosition="left">
-                         <InputIcon className="pi pi-search" />
-                         <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Buscar" className="p-inputtext-sm" />
-                    </IconField>
-               </div>
-          );
-     };
-
-     const optionsBodyTemplate = () => {
-          return (
-               <div className="flex justify-content-end gap-2">
-                    {permissionsByRole.length > 0 && hasAction(ACTIONS.VIEW) && <i className="pi pi-eye" style={{ fontSize: '1.2rem', cursor: 'pointer' }}></i>}
-                    {permissionsByRole.length > 0 && hasAction(ACTIONS.EDIT) && <i className="pi pi-user-edit" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => setVisibleRight(true)}></i>}
-                    {permissionsByRole.length > 0 && hasAction(ACTIONS.DELETE) && <i className="pi pi-trash" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={deleteAlertConfirm}></i>}
-               </div>
-          );
-     }
-
      const dialogFooterTemplate = () => {
           return <Button label="Cerrar" icon="pi pi-check" onClick={() => setDialogVisible(false)} />;
      };
 
-     const deleteAlertConfirm = () => {
-          confirmDialog({
-               group: 'delete',
-               message: 'Are you sure you want to proceed?',
-               header: 'Confirmation',
-               icon: 'pi pi-exclamation-triangle',
-               defaultFocus: 'accept',
-               //accept,
-               //reject
-          });
-     };
+     // const deleteAlertConfirm = () => {
+     //      confirmDialog({
+     //           group: 'delete',
+     //           message: 'Are you sure you want to proceed?',
+     //           header: 'Confirmation',
+     //           icon: 'pi pi-exclamation-triangle',
+     //           defaultFocus: 'accept',
+     //           //accept,
+     //           //reject
+     //      });
+     // };
 
      const alertModal = () => {
           confirmDialog({
@@ -150,45 +99,25 @@ const IndexUser = () => {
                          </div>
                          <div>
                               <Button icon="pi pi-external-link" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => setDialogVisible(true)} />
-
                          </div>
                     </div>
                </div>
                <Card>
-                    <DataTable
-                         value={userList}
-                         header={renderHeader}
-                         // scrollable
-                         // scrollHeight="400px"
-                         filters={filters}
-                         onFilter={(e) => setFilters(e.filters)}
-                         //selection={selectedUserValue}
-                         //onSelectionChange={(e) => setSelectedUserValue(e.value as UserData)}
-                         emptyMessage="No users found."
-                         sortField="email"
-                         sortOrder={-1}
-                         paginator
-                         rowsPerPageOptions={[10, 25, 50]}
-                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                         rows={10}
-                         dataKey="_id"
-                         loading={loading}
-                         tableStyle={{ minWidth: '50rem' }}
+                    {/* <UsersDataTable userList={userList} permissionsByRole={permissionsByRole} loading={loading} setVisibleRight={setVisibleRight} /> */}
+                    <UsersDataTable />
+
+                    <Dialog
+                         header="Users"
+                         visible={dialogVisible}
+                         style={{ width: '75vw' }}
+                         maximizable
+                         modal
+                         contentStyle={{ height: '300px' }}
+                         onHide={() => setDialogVisible(false)}
+                         footer={dialogFooterTemplate}
                     >
-                         <Column field="email" header="email" sortable />
-                         <Column field="city" header="city" sortable />
-                         <Column field="roles" header="roles" body={rolesBodyTemplate} sortable />
-                         <Column headerStyle={{ width: '5rem', textAlign: 'center' }} bodyStyle={{ textAlign: 'center', overflow: 'visible' }} body={optionsBodyTemplate} />
-                    </DataTable>
-                    <Dialog header="Users" visible={dialogVisible} style={{ width: '75vw' }} maximizable
-                         modal contentStyle={{ height: '300px' }} onHide={() => setDialogVisible(false)} footer={dialogFooterTemplate}>
-                         <DataTable value={userList} scrollable scrollHeight="flex" tableStyle={{ minWidth: '50rem' }}>
-                              <Column field="email" header="email" sortable />
-                              <Column field="city" header="city" sortable />
-                              <Column field="roles" header="roles" body={rolesBodyTemplate} sortable />
-                              <Column headerStyle={{ width: '5rem', textAlign: 'center' }} bodyStyle={{ textAlign: 'center', overflow: 'visible' }} body={optionsBodyTemplate} />
-                         </DataTable>
+                         {/* <UsersDataTable userList={userList} permissionsByRole={permissionsByRole} loading={loading} setVisibleRight={setVisibleRight} /> */}
+                         <UsersDataTable />
                     </Dialog>
                     <Sidebar
                          visible={visibleRight}
@@ -270,4 +199,3 @@ const IndexUser = () => {
 }
 
 export default IndexUser
-

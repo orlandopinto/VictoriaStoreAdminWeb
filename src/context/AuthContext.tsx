@@ -1,12 +1,6 @@
 import React, { createContext, useEffect, useMemo, useState } from 'react';
-import { PermissionsByRole, UserDataToken } from '../types';
+import { PermissionsByRole, PermissionsProfile, UserDataToken } from '../types';
 import { decrypt, encrypt } from '../utils/EncryptDecryptManager';
-
-// type PermissionsByRole = {
-//      resourseName: string;
-//      roleName: string;
-//      actionName: string;
-// };
 
 type Props = { children: React.ReactNode };
 
@@ -14,24 +8,22 @@ type AuthContextType = {
      isReady: boolean
      getToken(): string
      userLoggedData: UserDataToken | null;
-     storeSessionData: (userDataToken: UserDataToken, permissionsByRole: PermissionsByRole[]) => void;
+     storeSessionData: (userDataToken: UserDataToken, permissionsProfile: PermissionsProfile[]) => void;
      logout: () => void;
      isAuthenticated: () => boolean;
      isAllowed: (resource: string) => boolean;
      getPermissionList: (resource: string) => PermissionsByRole[];
      hasAction: (actionName: string) => boolean | undefined;
+     getPermissionsProfileStateList: () => PermissionsProfile[];
+     updatePermissionsProfile: (permissionsProfile: PermissionsProfile[]) => void
 };
 
-// Create context
 export const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
-// Provider component
 export const AuthProvider = ({ children }: Props) => {
      const [isReady, setIsReady] = useState(false);
      const [userLoggedData, setLoggedData] = useState<UserDataToken | null>(null);
 
-
-     // Utility functions
      const getUserLoggedData = (): UserDataToken | null => {
           try {
                const authData = sessionStorage.getItem('authorization');
@@ -42,22 +34,32 @@ export const AuthProvider = ({ children }: Props) => {
           }
      };
 
-     const getPermissionsList = (): PermissionsByRole[] => {
+     const getPermissionsProfileStateList = (): PermissionsProfile[] => {
           try {
-               const permissionsData = sessionStorage.getItem('permissionsByRole');
-               return permissionsData ? JSON.parse(decrypt(permissionsData)) : [];
+               const permissionsData = sessionStorage.getItem('permissionsProfile') as string;
+               const result = JSON.parse(decrypt(permissionsData)) as unknown as PermissionsProfile[];
+               //console.log('result: ', result)
+               return result;
           } catch (error) {
                console.error('Error retrieving permissions by role:', error);
                return [];
           }
      };
 
-     // Context methods
-     const storeSessionData = (userDataToken: UserDataToken, permissionsByRole: PermissionsByRole[]) => {
+     const storeSessionData = (userDataToken: UserDataToken, permissionsProfile: PermissionsProfile[]) => {
           try {
                sessionStorage.setItem('authorization', encrypt(JSON.stringify(userDataToken)));
-               sessionStorage.setItem('permissionsByRole', encrypt(JSON.stringify(permissionsByRole)));
+               sessionStorage.setItem('permissionsProfile', encrypt(JSON.stringify(permissionsProfile)));
                setLoggedData(userDataToken);
+               setIsReady(true);
+          } catch (error) {
+               console.error('Error storing session data:', error);
+          }
+     };
+
+     const updatePermissionsProfile = (permissionsProfile: PermissionsProfile[]) => {
+          try {
+               sessionStorage.setItem('permissionsProfile', encrypt(JSON.stringify(permissionsProfile)));
                setIsReady(true);
           } catch (error) {
                console.error('Error storing session data:', error);
@@ -67,7 +69,7 @@ export const AuthProvider = ({ children }: Props) => {
      const logout = () => {
           try {
                sessionStorage.removeItem('authorization');
-               sessionStorage.removeItem('permissionsByRole');
+               sessionStorage.removeItem('permissionsProfile');
                setLoggedData(null);
                setIsReady(false);
                // Redirect to login page
@@ -82,27 +84,23 @@ export const AuthProvider = ({ children }: Props) => {
      }, []);
 
      const isAllowed = (resource: string): boolean => {
-          const permissionsByRole = getPermissionList(resource);
-          return !!permissionsByRole.find((perm) => perm.resourseName === resource);
+          return getPermissionList(resource).some(perm => perm.pageName === resource);
      };
 
      const getPermissionList = (resource: string): PermissionsByRole[] => {
-          const permissionsByRole = getPermissionsList();
           const roles = userLoggedData?.userData.roles || [];
-          return permissionsByRole.filter(
-               (perm) => perm.resourseName === resource && roles.includes(perm.roleName)
-          );
+          return getPermissionsProfileStateList()
+               .flatMap(perms => perms.permissionsByRole)
+               .filter(perm => perm.pageName === resource && roles.includes(perm.roleName!));
      };
 
-     const hasAction = (actionName: string): boolean | undefined => {
-          const permissionsByRole = getPermissionsList();
+     const hasAction = (actionName: string): boolean => {
           const roles = userLoggedData?.userData.roles || [];
-          return permissionsByRole.some(
-               (perm) => perm.actionName === actionName && roles.includes(perm.roleName)
-          );
+          return getPermissionsProfileStateList()
+               .flatMap(perms => perms.permissionsByRole)
+               .some(perm => perm.actionName === actionName && roles.includes(perm.roleName!));
      };
 
-     // Initialize session data on mount
      useEffect(() => {
           const initializeSession = async () => {
                try {
@@ -118,13 +116,8 @@ export const AuthProvider = ({ children }: Props) => {
           initializeSession();
      }, []);
 
-     const getToken = () => {
-          const authData = sessionStorage.getItem('authorization');
-          const userDataToken = JSON.parse(decrypt(authData!)) as unknown as UserDataToken
-          return userDataToken.token
-     }
+     const getToken = () => getUserLoggedData()?.token || '';
 
-     // Provide context value
      const contextValue = useMemo(
           () => ({
                isReady,
@@ -135,7 +128,9 @@ export const AuthProvider = ({ children }: Props) => {
                isAuthenticated,
                isAllowed,
                getPermissionList,
-               hasAction
+               hasAction,
+               getPermissionsProfileStateList,
+               updatePermissionsProfile
           }),
           [userLoggedData, isAuthenticated]
      );

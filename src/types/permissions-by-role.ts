@@ -1,21 +1,49 @@
-export type PermissionsByRole = {
-     actionId: string
-     actionName: string
-     id: string
-     resourseId: string
-     resourseName: string
-     roleId: string
-     roleName: string
-     _id: string
+export type Role = {
+     id: string | null,
+     roleName: string,
+     roleDescription: string | null
 }
 
+export type Page = {
+     _id: string
+     pageName: string
+}
+
+export type Action = {
+     _id: string
+     actionName: string
+}
+
+export type UsersByRole = {
+     email: string,
+     firstName: string,
+     lastName: string,
+     imageProfilePath: string | null
+}
+
+export type PermissionsByRole = {
+     checked: boolean | false
+     id: string
+     actionId: string
+     actionName: string
+     pageId: string
+     pageName: string
+     roleId: string | null
+     roleName: string | null
+}
 
 export type PermissionsByRoleDTO = {
      actionId: string
      actionName: string
      id: string
-     resourseId: string
-     resourseName: string
+     pageId: string
+     pageName: string
      roleId: string
      roleName: string
+}
+
+export type PermissionsProfile = {
+     role: Role;
+     permissionsByRole: PermissionsByRole[];
+     usersByRole: UsersByRole[]
 }

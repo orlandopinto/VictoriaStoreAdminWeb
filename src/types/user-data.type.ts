@@ -20,4 +20,5 @@ export type UserData = {
      roles: string[]
      createdAt: string
      updatedAt: string
+     isActive: boolean
 }

@@ -25,4 +25,20 @@ export class PermissionController {
           }
      }
 
+     public async Save<T>(data: T): Promise<string | undefined> {
+          const service = new AppService(this.token, PERMISSION_ENDPOINT);
+          try {
+               const result = await service.Save<T>(data)
+                    .catch(error => {
+                         throw error;
+                    });
+               if (result) {
+                    return result;
+               }
+          } catch (error) {
+               //TODO: Registar el error en un archivo log o base de datos
+               throw error;
+          }
+     }
+
 }

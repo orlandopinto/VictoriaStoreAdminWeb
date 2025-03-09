@@ -3,9 +3,10 @@ export const AUTH_ENDPOINT = '/api/systemauth'
 export const USER_ENDPOINT = '/api/systemauth'
 export const ROLES_ENDPOINT = '/api/roles'
 export const ACCESS_ENDPOINT = '/api/access'
-export const RESOURSES_ENDPOINT = '/api/resourses'
+export const PAGES_ENDPOINT = '/api/pages'
 export const ACTIONS_ENDPOINT = '/api/actions'
 export const PERMISSION_ENDPOINT = '/api/permissions'
+export const DEFAULT_USER_IMAGE = 'https://res.cloudinary.com/dtnrekavg/image/upload/v1741195879/ProductImages/lymtcvke4mmgdxhj61la.png'
 
 export const FOLDER_TO_UPLOAD = 'ProductImages'
 
@@ -22,6 +23,7 @@ export const ACTIONS = {
      EDIT: 'edit',
      DELETE: 'delete',
      VIEW: 'view',
+     EXPORT: 'export',
      EXPORT_TO_PDF: 'exportToPdf',
      EXPORT_TO_EXCEL: 'exportToExcel',
      EXPORT_TO_WORD: 'exportToWord',
