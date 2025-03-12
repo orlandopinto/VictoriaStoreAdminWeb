@@ -32,12 +32,32 @@ export default class AppService {
 
      }
 
-     public async Save<T>(data: T): Promise<string> {
+     public async Post<T>(data: T): Promise<string> {
 
           try {
                const result = await axios({
                     url: this.ENDPOINT,
                     method: METHOD.POST,
+                    headers: this.headers as AxiosHeaders,
+                    data: JSON.stringify(data)
+               })
+                    .then(res => res.data)
+                    .catch(err => {
+                         throw err
+                    })
+               return result
+          } catch (error) {
+               throw error
+          }
+
+     }
+
+     public async Put<T>(data: T): Promise<string> {
+
+          try {
+               const result = await axios({
+                    url: this.ENDPOINT,
+                    method: METHOD.PUT,
                     headers: this.headers as AxiosHeaders,
                     data: JSON.stringify(data)
                })

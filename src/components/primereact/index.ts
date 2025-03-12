@@ -11,6 +11,15 @@ export * from 'primereact/confirmdialog';
 export * from 'primereact/dialog';
 export * from 'primereact/listbox';
 export * from 'primereact/overlaypanel'
-
+export * from 'primereact/picklist';
+export * from 'primereact/stepper';
+export * from 'primereact/accordion';
+export * from 'primereact/divider';
+export * from 'primereact/inputswitch';
+export * from 'primereact/inputtextarea';
+export * from 'primereact/message';
+export * from 'primereact/stepperpanel';
+export * from 'primereact/tabview';
+//export * from 'primereact/toast';
 //NOTA: NO se puede exportar primereact/api
 //export * from "primereact/api";

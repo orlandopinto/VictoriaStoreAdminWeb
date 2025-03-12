@@ -9,7 +9,8 @@ type AuthContextType = {
      getToken(): string
      userLoggedData: UserDataToken | null;
      storeSessionData: (userDataToken: UserDataToken, permissionsProfile: PermissionsProfile[]) => void;
-     logout: () => void;
+     //logout: () => void;
+     logout: VoidFunction;
      isAuthenticated: () => boolean;
      isAllowed: (resource: string) => boolean;
      getPermissionList: (resource: string) => PermissionsByRole[];
@@ -38,7 +39,6 @@ export const AuthProvider = ({ children }: Props) => {
           try {
                const permissionsData = sessionStorage.getItem('permissionsProfile') as string;
                const result = JSON.parse(decrypt(permissionsData)) as unknown as PermissionsProfile[];
-               //console.log('result: ', result)
                return result;
           } catch (error) {
                console.error('Error retrieving permissions by role:', error);

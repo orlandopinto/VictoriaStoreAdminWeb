@@ -1,23 +1,14 @@
 import { AxiosError } from 'axios';
-import { Accordion, AccordionTab } from 'primereact/accordion';
 import { FilterMatchMode } from 'primereact/api';
-import { Divider } from 'primereact/divider';
-import { InputSwitch, InputSwitchChangeEvent } from 'primereact/inputswitch';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { Message } from 'primereact/message';
-import { PickList, PickListChangeEvent } from 'primereact/picklist';
-import { Stepper, StepperRefAttributes } from 'primereact/stepper';
-import { StepperPanel } from 'primereact/stepperpanel';
-import { TabPanel, TabView } from 'primereact/tabview';
 import { Toast } from 'primereact/toast';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Column, confirmDialog, ConfirmDialog, DataTable, DataTableFilterMeta, Dialog, IconField, InputIcon, InputText } from '../../components/primereact/index';
+import { Accordion, AccordionTab, Button, Column, confirmDialog, ConfirmDialog, DataTable, DataTableFilterMeta, Dialog, Divider, IconField, InputIcon, InputSwitch, InputSwitchChangeEvent, InputText, InputTextarea, Message, PickList, PickListChangeEvent, Stepper, StepperPanel, StepperRefAttributes, TabPanel, TabView } from '../../components/primereact/index';
 import { ACTIONS, DEFAULT_USER_IMAGE } from '../../config/constants.d';
 import { ActionController, PageController, PermissionController, RoleController, UserController } from '../../controllers';
 import { useAuth } from "../../hooks";
 import { usePermissionStore } from '../../stores/usePermissionStore';
-import { Action, ApiResultResponse, Page, PermissionsByRole, Role, UserData, UsersByRole } from '../../types';
+import { Action, ApiResultResponse, Page, PermissionsByRole, PermissionsProfile, Role, UserData, UsersByRole } from '../../types';
 import { groupBy } from '../../utils';
 import UsersDataTable from './components/UsersDataTable';
 import './index.css';
@@ -162,7 +153,7 @@ const IndexRoles = () => {
           if (err) {
                confirmDialog({
                     group: 'alert',
-                    message: err.errorMessage,
+                    message: err.errorMessage ? err.errorMessage : err.message,
                     header: 'Error',
                     icon: 'pi pi-exclamation-triangle',
                     defaultFocus: 'accept',
@@ -187,14 +178,14 @@ const IndexRoles = () => {
           const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
           const [showRoleNameMessage, setShowRoleNameMessage] = useState(false)
           const [formData, setFormData] = useState<Role>({} as Role);
-          const [visible, setVisible] = useState<boolean>(false);
+          const [visibleRoleExistMessage, setVisibleRoleExistMessage] = useState<boolean>(false);
 
           const userStore = usePermissionStore()
 
           useEffect(() => {
                if (userStore.role) {
                     if (userStore.role.roleName)
-                         setFormData({ id: null, roleName: userStore.role.roleName, roleDescription: userStore.role.roleDescription });
+                         setFormData({ id: userStore.role.id, roleName: userStore.role.roleName, roleDescription: userStore.role.roleDescription });
                }
           }, []);
 
@@ -208,7 +199,7 @@ const IndexRoles = () => {
 
           const validateRole = () => {
                if (roleData.find(f => f.roleName === formData.roleName) && !isEditing) {
-                    setVisible(true);
+                    setVisibleRoleExistMessage(true);
                     return;
                }
                else if (!formData.roleName) {
@@ -217,8 +208,7 @@ const IndexRoles = () => {
                     setTimeout(() => setShowRoleNameMessage(false), 3000);
                     return;
                }
-               userStore.role = { id: null, roleName: formData.roleName, roleDescription: formData.roleDescription } as Role;
-               //console.log('userStore.role: ', userStore.role)
+               userStore.role = { id: formData.id, roleName: formData.roleName, roleDescription: formData.roleDescription } as Role;
                stepperRef.current?.nextCallback()
           }
 
@@ -228,9 +218,9 @@ const IndexRoles = () => {
                     <div><label>Name</label></div>
                     <div className="flex flex-row">
                          <div>
-                              <InputText className='p-inputtext-sm' id="roleName" style={{ width: '250px' }} ref={inputTextRef} name="roleName" value={formData.roleName} onChange={handleChange} required />
+                              <InputText className='p-inputtext-sm' id="roleName" disabled={isEditing ? true : false} style={{ width: '250px' }} ref={inputTextRef} name="roleName" value={formData.roleName} onChange={handleChange} required />
                          </div>
-                         {showRoleNameMessage && <div className='pl-2'><Message severity="error" text="Role name is required" style={{ padding: '.5rem 1rem' }} /></div>}
+                         <div id="RoleNameIsrequiredMessage" className={`${showRoleNameMessage ? '' : 'd-none'} pl-2`} ><Message severity="error" text="Role name is required" style={{ padding: '.5rem 1rem' }} /></div>
                     </div>
                     <div className="flex flex-column gap-2">
                          <label>Description</label>
@@ -239,12 +229,12 @@ const IndexRoles = () => {
                     <div style={{ display: 'none' }}>
                          <Button id="btnValidateRole" label="boton oculto" onClick={() => validateRole()} />
                     </div>
-                    <Dialog header="Error" style={{ width: '25%' }} visible={visible} onHide={() => { if (!visible) return; setVisible(false); }}>
+                    <Dialog header="Error" style={{ width: '25%' }} visible={visibleRoleExistMessage} onHide={() => { if (!visibleRoleExistMessage) return; setVisibleRoleExistMessage(false); }}>
                          <div className='flex align-items-center gap-3'>
                               <div><i className='pi pi-question-circle' style={{ fontSize: '4rem', color: 'var( --red-400)' }}></i></div>
                               <div><p>Role name already exists</p></div>
                          </div>
-                         <div className="flex flex-wrap justify-content-end pt-3"><Button iconPos='left' label="Aceptar" icon="pi pi-check" onClick={() => setVisible(false)} /></div>
+                         <div className="flex flex-wrap justify-content-end pt-3"><Button iconPos='left' label="Aceptar" icon="pi pi-check" onClick={() => setVisibleRoleExistMessage(false)} /></div>
                     </Dialog>
                </div>
           </div>
@@ -256,8 +246,6 @@ const IndexRoles = () => {
           const [mainCheckboxState, setMainCheckboxState] = useState<Record<string, boolean>>({});
           const [checkboxState, setCheckboxState] = useState<Record<string, boolean>>({});
           const [permissionsByRole, setPermissionsByRole] = useState<PermissionsByRole[]>([]);
-          //const [visible, setVisible] = useState(false)
-
 
           useEffect(() => {
                if (userStore.permissionsByRole.length > 0)
@@ -275,9 +263,8 @@ const IndexRoles = () => {
                counterByPage(permissionsByRole);
 
                counterActionsByPage.forEach(res => {
-                    if (permissionsByRole.some(f => f.pageName === res.pageName) && res.counter === actionsData.length) {
+                    if (permissionsByRole.some(f => f.pageName === res.pageName) && res.counter === actionsData.length)
                          updatedMainCheckboxState[res.pageId] = true;
-                    }
                });
 
                setMainCheckboxState(updatedMainCheckboxState);
@@ -290,11 +277,10 @@ const IndexRoles = () => {
                     pageCount[pageName] = (pageCount[pageName] || 0) + 1;
                     const existingPage = counterActionsByPage.find(page => page.pageName === pageName);
 
-                    if (existingPage) {
+                    if (existingPage)
                          existingPage.counter = pageCount[pageName];
-                    } else {
+                    else
                          counterActionsByPage.push({ pageName, counter: pageCount[pageName], pageId });
-                    }
                });
           }
 
@@ -323,7 +309,7 @@ const IndexRoles = () => {
                               actionId: action._id,
                               actionName: action.actionName,
                               pageId: page._id,
-                              roleId: null,
+                              roleId: userStore.role.id,
                               roleName: userStore.role.roleName
                          }))
                     ]
@@ -340,16 +326,11 @@ const IndexRoles = () => {
                userStore.permissionsByRole = updatedPermissionsByRole;
           }
 
-          // const validateIfHasAnyPermissionsByRole = () => {
-          //      userStore.permissionsByRole.length > 0 ? stepperRef.current?.nextCallback() : setVisible(true);
-          // }
-
           const accordionTabs = () => {
                return pagesData.map((page, index) => (
                     <AccordionTab
                          key={index}
                          header={<span className="font-bold white-space-nowrap">{page.pageName}</span>}>
-                         {/* <div style={{ display: 'none' }}><Button id="btnValidateIfHasAnyPermissionsByRole" label="boton oculto" onClick={() => validateIfHasAnyPermissionsByRole()} /></div> */}
                          <div className="dt-accordion-tab flex flex-column w-full p-0 ">
                               <div className='w-fulll flex justify-content-end' style={{ margin: '-1rem 0 1rem 0' }}>
                                    <span className='pr-2'>Select all</span>
@@ -377,7 +358,7 @@ const IndexRoles = () => {
                                                                       actionId: action._id,
                                                                       actionName: action.actionName,
                                                                       pageId: page._id,
-                                                                      roleId: null,
+                                                                      roleId: userStore.role.id,
                                                                       roleName: userStore.role.roleName
                                                                  }
                                                             )}
@@ -389,13 +370,6 @@ const IndexRoles = () => {
                                    }
                               </div>
                          </div>
-                         {/* <Dialog header="Error" style={{ width: '25%' }} visible={visible} onHide={() => { if (!visible) return; setVisible(false); }}>
-                              <div className='flex align-items-center gap-3'>
-                                   <div><i className='pi pi-question-circle' style={{ fontSize: '4rem', color: 'var( --red-400)' }}></i></div>
-                                   <div><p>Seleccione at least one action</p></div>
-                              </div>
-                              <div className="flex flex-wrap justify-content-end pt-3"><Button iconPos='left' label="Aceptar" icon="pi pi-check" onClick={() => setVisible(false)} /></div>
-                         </Dialog> */}
                     </AccordionTab>
                ));
           }
@@ -421,8 +395,14 @@ const IndexRoles = () => {
                setTarget(sourseUserData);
 
                if (userStore.permissionsByRole.length === 0) {
-                    let picklist = document.getElementsByClassName('p-picklist-buttons') as unknown as HTMLElement[]
-                    picklist[0].classList.add('v-hidden')
+                    let picklistButtons = document.getElementsByClassName('p-picklist-buttons') as unknown as HTMLElement[]
+                    picklistButtons[0].classList.add('v-hidden')
+
+                    let picklistWrapper = document.getElementsByClassName('p-picklist-target-wrapper') as unknown as HTMLElement[]
+                    for (const pick of picklistWrapper) {
+                         pick.classList.add('p-disabled');
+                    }
+                    userStore.usersByRole = [];
                }
 
           }, [userList, userStore.usersByRole]);
@@ -453,7 +433,7 @@ const IndexRoles = () => {
                     target={target}
                     onChange={onChange}
                     itemTemplate={itemTemplate}
-                    sourceHeader="Available"
+                    sourceHeader="Availables"
                     targetHeader="Selected"
                     sourceStyle={{ height: '24rem' }}
                     targetStyle={{ height: '24rem' }}
@@ -505,22 +485,34 @@ const IndexRoles = () => {
                     </TabPanel>
                     <TabPanel leftIcon="pi pi-shield mr-2" header="Permissions by this role">
                          {
-                              groupedByPage().map((page, index) => {
-                                   return (
-                                        <div key={index} className='permissions-by-role-container'>
-                                             <div className='review-pages-list'>
-                                                  <div className='review-page'>{page.page}</div>
-                                                  <div className='rewiew-actions-list'>
-                                                       {page.actions.map((a, actionIndex) => (<span key={actionIndex}>{a.actionName}</span>))}
+                              groupedByPage().length === 0 ?
+                                   <div key={0} className='w-full'>
+                                        <div>No existen páginas seleccionadas</div>
+                                   </div>
+                                   :
+                                   groupedByPage().map((page, index) => {
+                                        return (
+                                             <div key={index} className='permissions-by-role-container'>
+                                                  <div className='review-pages-list'>
+                                                       <div className='review-page'>{page.page}</div>
+                                                       <div className='rewiew-actions-list'>
+                                                            {page.actions.map((a, actionIndex) => (<span key={actionIndex}>{a.actionName}</span>))}
+                                                       </div>
                                                   </div>
                                              </div>
-                                        </div>
-                                   )
-                              })
+                                        )
+                                   })
                          }
                     </TabPanel>
                     <TabPanel leftIcon="pi pi-users mr-2" header="Users assigned to this role">
-                         {userStore.usersByRole.map((user, index) => (<div key={index}>{usersByRoleListTemplate(user)}</div>))}
+                         {
+                              userStore.usersByRole.length === 0
+                                   ?
+                                   <div key={0} className='w-full'>
+                                        <div>No existen usuarios seleccionadas</div>
+                                   </div>
+                                   :
+                                   userStore.usersByRole.map((user, index) => (<div key={index}>{usersByRoleListTemplate(user)}</div>))}
                     </TabPanel>
                </TabView>
           )
@@ -543,16 +535,16 @@ const IndexRoles = () => {
           }, [])
 
           const getPermissionsByRoleData = () => {
-               const permissionsByRoleStateList = getPermissionsProfileStateList();
-               const permissionsByRoleDataList: PermissionsByRoleData[] = permissionsByRoleStateList.map(permission => ({
+               const permissionsProfileStateList = getPermissionsProfileStateList();
+               const permissionsByRoleDataList: PermissionsByRoleData[] = permissionsProfileStateList.map(permission => ({
                     role: permission.role,
                     permissionsByRole: permission.permissionsByRole,
                     counterPages: 0,
                     usersByRole: permission.usersByRole,
                     counterUsers: permission.usersByRole.length
-               }));
+               })).sort((a, b) => a.usersByRole.length - b.usersByRole.length);
 
-               permissionsByRoleStateList.forEach(permission => {
+               permissionsProfileStateList.forEach(permission => {
                     const groupedData = groupBy(permission.permissionsByRole, "pageName");
 
                     Object.entries(groupedData).forEach(([, values]) => {
@@ -593,15 +585,24 @@ const IndexRoles = () => {
                          <div className="flex justify-content-end gap-2">
                               {
                                    permissionsByRole.length > 0 && hasAction(ACTIONS.EDIT) &&
-                                   <i className="pi pi-pencil" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => setEditStepperDialogVisible(true)}></i>
+                                   <i className="pi pi-pencil" style={{ fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => {
+                                        setRoleSelected(permisions.role)
+                                        setEditStepperDialogVisible(true)
+                                   }}></i>
                               }
                               {permissionsByRole.length > 0 && permisions.role.roleName !== "Administrator" && hasAction(ACTIONS.DELETE) && <i className="pi pi-trash" onClick={() => {
                                    setRoleSelected(permisions.role)
                                    setShowDeleteRoleModal(true)
-                              }
-                              } style={{ fontSize: '1.2rem', cursor: 'pointer' }} ></i>}
+                              }} style={{ fontSize: '1.2rem', cursor: 'pointer' }} ></i>}
                          </div>
                     );
+               }
+
+               const newRole = () => {
+                    userStore.role = {} as Role;
+                    userStore.permissionsByRole = [];
+                    userStore.usersByRole = [];
+                    setStepperDialogVisible(true)
                }
 
                const rolesRenderHeader = () => {
@@ -613,7 +614,7 @@ const IndexRoles = () => {
                                         <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Buscar" className="p-inputtext-sm" />
                                    </IconField>
                               </div>
-                              <div><Button icon={"pi pi-plus"} label="Nuevo rol" className="w-8rem" onClick={() => setStepperDialogVisible(true)}></Button></div>
+                              <div><Button icon={"pi pi-plus"} label="Nuevo rol" className="w-8rem" onClick={newRole}></Button></div>
                          </div>
                     );
                };
@@ -623,17 +624,23 @@ const IndexRoles = () => {
 
                          const controller = new RoleController(getToken());
                          const result = await controller.DeleteRole(roleSelected) as unknown as ApiResultResponse
-                         const newDtPermissionsByRoleData = dtPermissionsByRoleData.filter(f => f.role.roleName !== roleSelected.roleName);
-                         toast.current?.show({ severity: 'success', summary: 'Confirmed', detail: result.message, life: 3000 });
-                         setDtPermissionsByRoledata(newDtPermissionsByRoleData);
+                         if (!result.hasError) {
+                              toast.current?.show({ severity: 'success', summary: 'Confirmed', detail: result.message, life: 3000 });
+                              let permissionsProfileStateListTmp = getPermissionsProfileStateList().filter(f => f.role.roleName !== roleSelected.roleName);
+                              updatePermissionsProfile([...permissionsProfileStateListTmp]);
+                              getPermissionsByRoleData();
+                         }
+                         else {
+                              const err = new Error(result.message);
+                              alertModal(err);
+                         }
 
                     } catch (err) {
                          console.log('error: ', err)
                          const error = err as unknown as AxiosError
                          const errorMessage = (error?.response?.data as any).error
-                         if (errorMessage === 'Invalid Bearer token') {
+                         if (errorMessage === 'Invalid Bearer token')
                               alertModal();
-                         }
                     }
                }
 
@@ -668,38 +675,142 @@ const IndexRoles = () => {
 
           const RoleStepper = ({ isEditing, role }: RolesStpperProps) => {
 
-               if (role?.roleName) {
-                    const roleSelected = dtPermissionsByRoleData.filter(f => f.role.roleName === role?.roleName)[0]
-                    if (roleSelected) {
-                         userStore.role = { id: null, roleName: roleSelected.role.roleName, roleDescription: roleSelected.role.roleDescription };
-                         roleSelected.permissionsByRole.map((item) => item.checked = true)
-                         userStore.permissionsByRole = roleSelected.permissionsByRole;
-                         userStore.usersByRole = roleSelected.usersByRole;
+               useEffect(() => {
+                    if (role?.roleName && isEditing) {
+                         const permission = dtPermissionsByRoleData.find(p => p.role.roleName === role?.roleName);
+                         if (permission) {
+                              userStore.role = permission.role
+                              userStore.permissionsByRole = permission.permissionsByRole
+                              userStore.usersByRole = permission.usersByRole
+                         }
                     }
-               }
-               else {
-                    userStore.role = {} as Role;
-                    userStore.permissionsByRole = [];
-                    userStore.usersByRole = [];
-               }
+                    else {
+                         const datos = document.getElementById('roleName')
+                         console.log('datos: ', datos);
+                    }
+               }, [])
 
-               const saveRole = async (isEditing: boolean) => {
+               const savePermissions = async (isEditing: boolean) => {
                     try {
 
                          const controller = new PermissionController(getToken());
-                         userStore.role.id = "123"
-                         const result = await controller.Save(userStore) as unknown as ApiResultResponse
+                         if (!isEditing)
+                              userStore.role.id = "67a3566daec1565315b5a9c2"
+
+                         const result = isEditing ? await controller.Update(userStore) as unknown as ApiResultResponse : await controller.Save(userStore) as unknown as ApiResultResponse
+
                          const permissionsProfileStateList = getPermissionsProfileStateList();
-                         updatePermissionsProfile([...permissionsProfileStateList, userStore]);
-                         getPermissionsByRoleData();
-                         isEditing ? setEditStepperDialogVisible(false) : setStepperDialogVisible(false);
-                         toast.current?.show({ severity: 'success', summary: 'Saved', detail: result.message, life: 3000 });
+                         let permissionsProfileStateListTmp: PermissionsProfile[] = [];
+
+                         if (!result.hasError) {
+                              if (isEditing) { //EDIT
+                                   for (const perms of permissionsProfileStateList) {
+                                        if (perms.role.roleName === userStore.role.roleName) {
+                                             perms.role = userStore.role
+                                             perms.permissionsByRole = userStore.permissionsByRole
+                                             perms.usersByRole = userStore.usersByRole
+                                        }
+                                        permissionsProfileStateListTmp.push(perms)
+                                   }
+                              }
+                              else {
+                                   const data = result.data as unknown as PermissionsProfile
+                                   userStore.role = data.role
+                                   permissionsProfileStateListTmp = [...permissionsProfileStateList, userStore]
+                              }
+
+                              updatePermissionsProfile([...permissionsProfileStateListTmp]);
+                              getPermissionsByRoleData();
+
+                              isEditing ? setEditStepperDialogVisible(false) : setStepperDialogVisible(false);
+                              toast.current?.show({ severity: 'success', summary: isEditing ? 'Updated' : 'Saved', detail: result.message, life: 3000 });
+                         }
+                         else {
+                              const err = new Error(result.message);
+                              alertModal(err);
+                         }
 
                     } catch (err) {
                          console.log('error: ', err)
                          const error = err as unknown as AxiosError
                          alertModal((error?.response?.data as any).error);
                     }
+               }
+
+               const saveRole = async () => {
+
+                    try {
+                         const roleNameInputText = document.getElementById('roleName') as HTMLInputElement;
+                         const roleDescriptionInputText = document.getElementById('roleDescription') as HTMLInputElement;
+
+                         if (!roleNameInputText.value) {
+                              const errorMessage = document.getElementById('RoleNameIsrequiredMessage') as HTMLDivElement;
+                              errorMessage.classList.remove('d-none');
+                              setTimeout(() => errorMessage.classList.add('d-none'), 3000);
+                              return;
+                         }
+
+                         const controller = new RoleController(getToken());
+                         const result = await controller.AddRole({ id: "67a3566daec1565315b5a9c2", roleName: roleNameInputText.value, roleDescription: roleDescriptionInputText.value }) as unknown as ApiResultResponse;
+
+                         if (result.hasError) {
+                              alertModal(new Error(result.message));
+                              return;
+                         }
+
+                         toast.current?.show({ severity: 'success', summary: 'Saved', detail: result.message, life: 3000 });
+                         const permissionsProfileList = getPermissionsProfileStateList()
+
+                         let newPermissionProfile: PermissionsProfile = {
+                              role: result.data as Role,
+                              permissionsByRole: [],
+                              usersByRole: []
+                         }
+
+                         updatePermissionsProfile([...permissionsProfileList, newPermissionProfile]);
+                         getPermissionsByRoleData();
+                         setStepperDialogVisible(false);
+
+                    } catch (err) {
+                         console.log('error: ', err)
+                         const error = err as unknown as AxiosError
+                         alertModal((error?.response?.data as any).error);
+                    }
+
+               }
+
+               const updateRole = async () => {
+
+                    try {
+                         const roleDescriptionInputText = document.getElementById('roleDescription') as HTMLInputElement;
+                         roleSelected.roleDescription = roleDescriptionInputText.value;
+                         const controller = new RoleController(getToken());
+                         const result = await controller.UpdateRole(roleSelected) as unknown as ApiResultResponse;
+
+                         if (result.hasError) {
+                              alertModal(new Error(result.message));
+                              return;
+                         }
+
+                         toast.current?.show({ severity: 'success', summary: 'Updated', detail: result.message, life: 3000 });
+                         const updatedRole = result.data as Role;
+                         const updatedPermissionsProfile = getPermissionsProfileStateList().map(perms => {
+                              if (perms.role.roleName === updatedRole.roleName) {
+                                   return { ...perms, role: updatedRole, permissionsByRole: userStore.permissionsByRole, usersByRole: userStore.usersByRole };
+                              }
+                              return perms;
+                         });
+
+                         updatePermissionsProfile(updatedPermissionsProfile);
+                         getPermissionsByRoleData();
+                         setEditStepperDialogVisible(false);
+
+                    } catch (err) {
+                         console.log('error: ', err)
+                         const error = err as unknown as AxiosError
+                         alertModal((error?.response?.data as any).error);
+                    }
+
                }
 
                return (
@@ -714,6 +825,13 @@ const IndexRoles = () => {
                                         <Button label="Cancel" outlined severity="secondary" icon="pi pi-times" onClick={() => {
                                              isEditing ? setEditStepperDialogVisible(false) : setStepperDialogVisible(false)
                                         }} />
+                                        {
+                                             isEditing
+                                                  ?
+                                                  <Button label="Update" icon="pi pi-refresh" iconPos="left" onClick={updateRole} />
+                                                  :
+                                                  <Button label="Save" icon="pi pi-save" iconPos="left" onClick={saveRole} />
+                                        }
                                         <Button label="Siguiente" outlined icon="pi pi-arrow-right" iconPos="right" onClick={() => nextCallback()} />
                                    </div>
                               </StepperPanel>
@@ -750,7 +868,7 @@ const IndexRoles = () => {
                                    <Divider />
                                    <div className="flex pt-4 justify-content-end gap-2">
                                         <Button label="Atras" outlined severity="secondary" icon="pi pi-arrow-left" onClick={() => stepperRef.current?.prevCallback()} />
-                                        <Button label="Finish" outlined icon="pi pi-times" onClick={() => saveRole(isEditing)} />
+                                        <Button label="Finish" outlined icon="pi pi-times" onClick={() => savePermissions(isEditing)} />
                                    </div>
                               </StepperPanel>
                          </Stepper>
