@@ -1,16 +1,17 @@
 import { PERMISSION_ENDPOINT } from "../config/constants.d";
 import AppService from "../services/AppService";
+import { UserDataToken } from "../types";
 
 export class PermissionController {
 
-     token: string
+     _userDataToken: UserDataToken
 
-     constructor(token: string) {
-          this.token = token as string;
+     constructor(userDataToken: UserDataToken) {
+          this._userDataToken = userDataToken;
      }
 
      public Get = async (): Promise<string | undefined> => {
-          const service = new AppService(this.token, PERMISSION_ENDPOINT);
+          const service = new AppService(this._userDataToken, PERMISSION_ENDPOINT);
           try {
                const data = await service.Get()
                     .catch(error => {
@@ -26,7 +27,7 @@ export class PermissionController {
      }
 
      public async Save<T>(data: T): Promise<string | undefined> {
-          const service = new AppService(this.token, PERMISSION_ENDPOINT);
+          const service = new AppService(this._userDataToken, PERMISSION_ENDPOINT);
           try {
                const result = await service.Post<T>(data)
                     .catch(error => {
@@ -42,7 +43,7 @@ export class PermissionController {
      }
 
      public async Update<T>(data: T): Promise<string | undefined> {
-          const service = new AppService(this.token, PERMISSION_ENDPOINT);
+          const service = new AppService(this._userDataToken, PERMISSION_ENDPOINT);
           try {
                const result = await service.Put<T>(data)
                     .catch(error => {

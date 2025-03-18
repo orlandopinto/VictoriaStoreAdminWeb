@@ -3,14 +3,15 @@ import { FilterMatchMode } from 'primereact/api';
 import { Toast } from 'primereact/toast';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Accordion, AccordionTab, Button, Column, confirmDialog, ConfirmDialog, DataTable, DataTableFilterMeta, Dialog, Divider, IconField, InputIcon, InputSwitch, InputSwitchChangeEvent, InputText, InputTextarea, Message, PickList, PickListChangeEvent, Stepper, StepperPanel, StepperRefAttributes, TabPanel, TabView } from '../../components/primereact/index';
+import { Accordion, AccordionTab, Button, Column, confirmDialog, ConfirmDialog, DataTable, DataTableFilterMeta, Dialog, Divider, IconField, InputIcon, InputSwitch, InputSwitchChangeEvent, InputText, InputTextarea, Message, PickList, PickListChangeEvent, Stepper, StepperPanel, StepperRefAttributes, TabPanel, TabView, TabViewTabChangeEvent } from '../../components/primereact/index';
 import { ACTIONS, DEFAULT_USER_IMAGE } from '../../config/constants.d';
 import { ActionController, PageController, PermissionController, RoleController, UserController } from '../../controllers';
 import { useAuth } from "../../hooks";
 import { usePermissionStore } from '../../stores/usePermissionStore';
 import { Action, ApiResultResponse, Page, PermissionsByRole, PermissionsProfile, Role, UserData, UsersByRole } from '../../types';
 import { groupBy } from '../../utils';
-import UsersDataTable from './components/UsersDataTable';
+import PagesDataTable from '../pages/PagesDataTable';
+import UsersDataTable from '../users/UsersDataTable';
 import './index.css';
 
 const IndexRoles = () => {
@@ -42,7 +43,7 @@ const IndexRoles = () => {
 
      //..:: [ HOOKS ] ::..
      //WARNING: ..:: [ Las siguientes lineas son obligatiorias para ejecutar los permisos ]::..
-     const { getToken, logout, hasAction, getPermissionList, isAllowed, getPermissionsProfileStateList, updatePermissionsProfile } = useAuth();
+     const { userLoggedData, hasAction, getPermissionList, isAllowed, getPermissionsProfileStateList, updatePermissionsProfile } = useAuth();
      const navigate = useNavigate();
      const toast = useRef<Toast>(null);
 
@@ -83,7 +84,7 @@ const IndexRoles = () => {
 
      const loadUsersData = async () => {
           try {
-               const controller = new UserController(getToken())
+               const controller = new UserController(userLoggedData!)
                const data = await controller.GetUsers();
                setUserList(data as unknown as UserData[])
 
@@ -98,7 +99,7 @@ const IndexRoles = () => {
 
      const loadRoleData = async () => {
           try {
-               const controller = new RoleController(getToken())
+               const controller = new RoleController(userLoggedData!)
                const data = await controller.GetRoles() as unknown as ApiResultResponse;
                setRoleData(data?.data as unknown as Role[])
 
@@ -113,7 +114,7 @@ const IndexRoles = () => {
 
      const loadPagesData = async () => {
           try {
-               const controller = new PageController(getToken())
+               const controller = new PageController(userLoggedData!)
                const data = await controller.GetPages() as unknown as ApiResultResponse;
                setPagesData(data?.data as unknown as Page[])
           } catch (err) {
@@ -128,7 +129,7 @@ const IndexRoles = () => {
 
      const loadActionsData = async () => {
           try {
-               const controller = new ActionController(getToken())
+               const controller = new ActionController(userLoggedData!)
                const data = await controller.GetActions() as unknown as ApiResultResponse;
                setActionsData(data?.data as unknown as Action[])
 
@@ -144,10 +145,6 @@ const IndexRoles = () => {
      const accept = () => {
           setShowAlertModal(false);
      }
-
-     // const closeModal = () => {
-     //      setShowAlertModal(false);
-     // }
 
      const alertModal = (err?: any) => {
           if (err) {
@@ -327,51 +324,55 @@ const IndexRoles = () => {
           }
 
           const accordionTabs = () => {
-               return pagesData.map((page, index) => (
-                    <AccordionTab
-                         key={index}
-                         header={<span className="font-bold white-space-nowrap">{page.pageName}</span>}>
-                         <div className="dt-accordion-tab flex flex-column w-full p-0 ">
-                              <div className='w-fulll flex justify-content-end' style={{ margin: '-1rem 0 1rem 0' }}>
-                                   <span className='pr-2'>Select all</span>
-                                   <InputSwitch
-                                        checked={mainCheckboxState[`${page._id}`] || false}
-                                        onChange={(e: InputSwitchChangeEvent) => {
-                                             setMainCheckboxState((prevState) => ({ ...prevState, [page._id]: e.value }));
-                                             selectAllActionsByPage(e.value, page)
-                                        }}
-                                   />
+               return pagesData.length === 0
+                    ?
+                    <div>No hay datos</div>
+                    :
+                    pagesData.map((page, index) => (
+                         <AccordionTab
+                              key={index}
+                              header={<span className="font-bold white-space-nowrap">{page.pageName}</span>}>
+                              <div className="dt-accordion-tab flex flex-column w-full p-0 ">
+                                   <div className='w-fulll flex justify-content-end' style={{ margin: '-1rem 0 1rem 0' }}>
+                                        <span className='pr-2'>Select all</span>
+                                        <InputSwitch
+                                             checked={mainCheckboxState[`${page._id}`] || false}
+                                             onChange={(e: InputSwitchChangeEvent) => {
+                                                  setMainCheckboxState((prevState) => ({ ...prevState, [page._id]: e.value }));
+                                                  selectAllActionsByPage(e.value, page)
+                                             }}
+                                        />
+                                   </div>
+                                   <div className="actions-container">
+                                        {
+                                             actionsData.map((action, index) => {
+                                                  return (
+                                                       <div key={index} className={`action-box action-box-${index}`}>
+                                                            <InputSwitch
+                                                                 id={`${page._id}.${action._id}`}
+                                                                 checked={checkboxState[`${page._id}.${action._id}`] || false} // Default to false if not initialized
+                                                                 onChange={(e) => handleCheckboxChange(
+                                                                      {
+                                                                           checked: e.value,
+                                                                           id: `${page._id}.${action._id}`,
+                                                                           pageName: page.pageName,
+                                                                           actionId: action._id,
+                                                                           actionName: action.actionName,
+                                                                           pageId: page._id,
+                                                                           roleId: userStore.role.id,
+                                                                           roleName: userStore.role.roleName
+                                                                      }
+                                                                 )}
+                                                            />
+                                                            <label>{action.actionName}</label>
+                                                       </div>
+                                                  )
+                                             })
+                                        }
+                                   </div>
                               </div>
-                              <div className="actions-container">
-                                   {
-                                        actionsData.map((action, index) => {
-                                             return (
-                                                  <div key={index} className={`action-box action-box-${index}`}>
-                                                       <InputSwitch
-                                                            id={`${page._id}.${action._id}`}
-                                                            checked={checkboxState[`${page._id}.${action._id}`] || false} // Default to false if not initialized
-                                                            onChange={(e) => handleCheckboxChange(
-                                                                 {
-                                                                      checked: e.value,
-                                                                      id: `${page._id}.${action._id}`,
-                                                                      pageName: page.pageName,
-                                                                      actionId: action._id,
-                                                                      actionName: action.actionName,
-                                                                      pageId: page._id,
-                                                                      roleId: userStore.role.id,
-                                                                      roleName: userStore.role.roleName
-                                                                 }
-                                                            )}
-                                                       />
-                                                       <label>{action.actionName}</label>
-                                                  </div>
-                                             )
-                                        })
-                                   }
-                              </div>
-                         </div>
-                    </AccordionTab>
-               ));
+                         </AccordionTab>
+                    ));
           }
 
           return (
@@ -622,7 +623,7 @@ const IndexRoles = () => {
                const acceptDeleteRole = async () => {
                     try {
 
-                         const controller = new RoleController(getToken());
+                         const controller = new RoleController(userLoggedData!);
                          const result = await controller.DeleteRole(roleSelected) as unknown as ApiResultResponse
                          if (!result.hasError) {
                               toast.current?.show({ severity: 'success', summary: 'Confirmed', detail: result.message, life: 3000 });
@@ -648,11 +649,13 @@ const IndexRoles = () => {
                     <>
                          <DataTable
                               className='dt-roles' value={dtPermissionsByRoleData} header={rolesRenderHeader} filters={filters} onFilter={(e) => setFilters(e.filters)} emptyMessage="No users found."
-                              sortField="email" sortOrder={-1} dataKey="role.roleName" loading={loading} tableStyle={{ minWidth: '50rem' }}
+                              sortField="role.roleName" sortOrder={1} dataKey="role.roleName" loading={loading} tableStyle={{ minWidth: '50rem' }}
                          >
                               <Column field="role.roleName" header="Role" sortable />
                               <Column field="counterPages" header="Pages" sortable />
                               <Column field="counterUsers" header="Users" sortable />
+                              <Column field="role.createdAt" header="Creado" sortable />
+                              <Column field="role.updatedAt" header="Actualizado" sortable />
                               <Column headerStyle={{ width: '5rem', textAlign: 'center' }} bodyStyle={{ textAlign: 'center', overflow: 'visible' }} body={rolesOptionsBodyTemplate} />
                          </DataTable>
                          <ConfirmDialog
@@ -693,7 +696,7 @@ const IndexRoles = () => {
                const savePermissions = async (isEditing: boolean) => {
                     try {
 
-                         const controller = new PermissionController(getToken());
+                         const controller = new PermissionController(userLoggedData!);
                          if (!isEditing)
                               userStore.role.id = "67a3566daec1565315b5a9c2"
 
@@ -750,7 +753,7 @@ const IndexRoles = () => {
                               return;
                          }
 
-                         const controller = new RoleController(getToken());
+                         const controller = new RoleController(userLoggedData!);
                          const result = await controller.AddRole({ id: "67a3566daec1565315b5a9c2", roleName: roleNameInputText.value, roleDescription: roleDescriptionInputText.value }) as unknown as ApiResultResponse;
 
                          if (result.hasError) {
@@ -784,7 +787,7 @@ const IndexRoles = () => {
                     try {
                          const roleDescriptionInputText = document.getElementById('roleDescription') as HTMLInputElement;
                          roleSelected.roleDescription = roleDescriptionInputText.value;
-                         const controller = new RoleController(getToken());
+                         const controller = new RoleController(userLoggedData!);
                          const result = await controller.UpdateRole(roleSelected) as unknown as ApiResultResponse;
 
                          if (result.hasError) {
@@ -876,17 +879,23 @@ const IndexRoles = () => {
                )
           }
 
+          const onTabChange = (e: TabViewTabChangeEvent) => {
+               setTabActiveIndex(e.index);
+               if (e.index === 1)
+                    loadPagesData();
+          }
+
           return (
                <>
-                    <TabView className='roles-tab-view' activeIndex={tabActiveIndex} onTabChange={(e) => setTabActiveIndex(e.index)}>
+                    <TabView className='roles-tab-view' activeIndex={tabActiveIndex} onTabChange={onTabChange}>
                          <TabPanel header="Users" leftIcon="pi pi-users mr-2">
                               <UsersDataTable />
                          </TabPanel>
-                         <TabPanel header="Role" rightIcon="pi pi-lock ml-2">
+                         <TabPanel header="Roles" rightIcon="pi pi-lock ml-2">
                               <RoleDatatable />
                          </TabPanel>
                          <TabPanel header="Pages" leftIcon="pi pi-clone mr-2">
-                              AQUI COMPONENTE PARA MOSTRAR Y AGREGAR PAGINAS
+                              <PagesDataTable />
                          </TabPanel>
                     </TabView>
                     <Dialog header="New role" visible={stepperDialogVisible} onHide={() => setStepperDialogVisible(false)} style={{ width: '75vw', height: '90vh' }} modal maximizable resizable={false} contentStyle={{ height: '300px' }} >

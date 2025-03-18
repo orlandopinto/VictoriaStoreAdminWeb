@@ -1,16 +1,17 @@
 import { ACTIONS_ENDPOINT } from "../config/constants.d";
 import AppService from "../services/AppService";
+import { UserDataToken } from "../types";
 
 export class ActionController {
 
-     token: string
+     _userDataToken: UserDataToken
 
-     constructor(token: string) {
-          this.token = token as string;
+     constructor(userDataToken: UserDataToken) {
+          this._userDataToken = userDataToken;
      }
 
      public GetActions = async (): Promise<string | undefined> => {
-          const service = new AppService(this.token, ACTIONS_ENDPOINT);
+          const service = new AppService(this._userDataToken, ACTIONS_ENDPOINT);
           try {
                const data = await service.Get()
                     .catch(error => {

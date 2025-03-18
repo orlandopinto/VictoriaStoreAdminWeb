@@ -7,7 +7,7 @@ import { ACTIONS } from '../../config/constants.d';
 import { UserController } from "../../controllers/user.controller";
 import { useAuth } from "../../hooks";
 import { PermissionsByRole, UserData } from "../../types";
-import UsersDataTable from '../roles/components/UsersDataTable';
+import UsersDataTable from './UsersDataTable';
 import "./index.css";
 
 const IndexUser = () => {
@@ -15,7 +15,7 @@ const IndexUser = () => {
 
      //..:: [ HOOKS ] ::..
      //WARNING: ..:: [ Las siguientes lineas son obligatiorias para ejecutar los permisos ]::..
-     const { getToken, logout, hasAction, getPermissionList, isAllowed } = useAuth();
+     const { userLoggedData, logout, hasAction, getPermissionList, isAllowed } = useAuth();
      const navigate = useNavigate();
      //..::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::..
 
@@ -23,7 +23,7 @@ const IndexUser = () => {
           getUsersData()
      }, [])
 
-     const controller = new UserController(getToken())
+     const controller = new UserController(userLoggedData!)
 
      //..:: [ HOOKS ] ::..
      //const { t } = useTranslation();
@@ -103,9 +103,7 @@ const IndexUser = () => {
                     </div>
                </div>
                <Card>
-                    {/* <UsersDataTable userList={userList} permissionsByRole={permissionsByRole} loading={loading} setVisibleRight={setVisibleRight} /> */}
                     <UsersDataTable />
-
                     <Dialog
                          header="Users"
                          visible={dialogVisible}
@@ -116,7 +114,6 @@ const IndexUser = () => {
                          onHide={() => setDialogVisible(false)}
                          footer={dialogFooterTemplate}
                     >
-                         {/* <UsersDataTable userList={userList} permissionsByRole={permissionsByRole} loading={loading} setVisibleRight={setVisibleRight} /> */}
                          <UsersDataTable />
                     </Dialog>
                     <Sidebar

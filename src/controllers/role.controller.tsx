@@ -1,16 +1,17 @@
 import { ROLES_ENDPOINT } from "../config/constants.d";
 import AppService from "../services/AppService";
-import { Role } from "../types";
+import { Role, UserDataToken } from "../types";
 
 export class RoleController {
 
-     token: string
+     _userDataToken: UserDataToken
 
-     constructor(token: string) {
-          this.token = token as string;
+     constructor(userDataToken: UserDataToken) {
+          this._userDataToken = userDataToken;
      }
+
      public AddRole = async (role: Role): Promise<string | undefined> => {
-          const service = new AppService(this.token, ROLES_ENDPOINT);
+          const service = new AppService(this._userDataToken, ROLES_ENDPOINT);
           try {
                const data = await service.Post(role)
                     .catch(error => {
@@ -26,7 +27,7 @@ export class RoleController {
      }
 
      public UpdateRole = async (role: Role): Promise<string | undefined> => {
-          const service = new AppService(this.token, ROLES_ENDPOINT);
+          const service = new AppService(this._userDataToken, ROLES_ENDPOINT);
           try {
                const data = await service.Put(role)
                     .catch(error => {
@@ -42,7 +43,7 @@ export class RoleController {
      }
 
      public DeleteRole = async (role: Role): Promise<string | undefined> => {
-          const service = new AppService(this.token, ROLES_ENDPOINT);
+          const service = new AppService(this._userDataToken, ROLES_ENDPOINT);
           try {
                const data = await service.Delete(role)
                     .catch(error => {
@@ -58,7 +59,7 @@ export class RoleController {
      }
 
      public GetRoles = async (): Promise<string | undefined> => {
-          const service = new AppService(this.token, ROLES_ENDPOINT);
+          const service = new AppService(this._userDataToken, ROLES_ENDPOINT);
           try {
                const data = await service.Get()
                     .catch(error => {

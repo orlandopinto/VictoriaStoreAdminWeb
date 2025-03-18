@@ -11,7 +11,7 @@ import { AuthController } from '../../controllers/auth.controller';
 import { PermissionController } from '../../controllers/permission.controller';
 import { useAuth } from '../../hooks';
 import useLanguages from '../../hooks/useLanguages';
-import { ApiResultResponse, Language, PermissionsProfile, UserDataToken } from '../../types';
+import { ApiResultResponse, Language, PermissionsProfile, UserData, UserDataToken } from '../../types';
 import { Validators } from '../../utils/Validators';
 import './login.css';
 
@@ -27,7 +27,7 @@ function Login() {
      const [loading, setLoading] = useState<boolean>(false);
 
      useEffect(() => {
-          //TODO: Hay que esperar que caduque el token para ver si redirecciona
+          //TODO: Hay que esperar que caduque el accessToken para ver si redirecciona
           if (isAuthenticated())
                navigate('/dashboard')
      }, [])
@@ -57,34 +57,38 @@ function Login() {
                     errorAlert('Email is not valid')
                     return
                }
-               const apiResultResponse = await AuthController.Login(email, password) as unknown as ApiResultResponse
+               const apiResultResponse = await AuthController.Login(email, password) as unknown as ApiResultResponse;
                if (apiResultResponse.hasError) {
-                    const err = apiResultResponse.message
+                    const err = apiResultResponse.message;
                     console.log('err: ', err)
                     if (err && err.length > 0) {
                          errorAlert(err)
                     }
                     return
                }
-               const permissionsByRole = await getPermission(apiResultResponse.data.token) as unknown as PermissionsProfile[]
-
-               const userDataToken = apiResultResponse.data as unknown as UserDataToken
-
+               const permissionsByRole = await getPermission(apiResultResponse.data.accessToken, apiResultResponse.data.refreshToken) as unknown as PermissionsProfile[];
+               const userDataToken = apiResultResponse.data as unknown as UserDataToken;
                storeSessionData(userDataToken, permissionsByRole);
                navigate('/dashboard')
           } catch (error) {
                setLoading(false);
-               const handledError = (error as AxiosError).response?.data as Record<string, string>
-               errorAlert(handledError.error)
+               const handledError = (error as AxiosError).response?.data as Record<string, string>;
+               errorAlert(handledError.error);
           }
           finally {
                setLoading(false);
           }
      }
 
-     const getPermission = async (token: string): Promise<PermissionsProfile[]> => {
+     const getPermission = async (accessToken: string, refreshToken: string): Promise<PermissionsProfile[]> => {
           try {
-               const result = await new PermissionController(token).Get() as unknown as ApiResultResponse
+               const userDataToken: UserDataToken = {
+                    accessToken: accessToken,
+                    refreshToken: refreshToken,
+                    userData: {} as UserData
+               }
+
+               const result = await new PermissionController(userDataToken).Get() as unknown as ApiResultResponse
                if (result.hasError) {
                     const err = result.message
                     console.log('err: ', err)
@@ -92,7 +96,7 @@ function Login() {
                          errorAlert(err)
                     }
                }
-               return result.data as unknown as PermissionsProfile[]
+               return result.data as unknown as PermissionsProfile[];
           } catch (error) {
                const handledError = (error as AxiosError).response?.data as Record<string, string>
                errorAlert(handledError.error)

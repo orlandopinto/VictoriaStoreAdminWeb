@@ -1,7 +1,9 @@
 export type Role = {
-     id: string | null,
-     roleName: string,
+     id: string | null
+     roleName: string
      roleDescription: string | null
+     createdAt?: Date | null
+     updatedAt?: Date | null
 }
 
 export type Page = {
