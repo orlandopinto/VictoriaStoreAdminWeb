@@ -140,7 +140,7 @@ const Navigation = () => {
           <div className='text-center pt-2 gap'>
                <div>
                     <Avatar
-                         image={userLoggedData?.userData.imageProfilePath}
+                         image={userLoggedData?.userData.secure_url}
                          id="avatarFoto"
                          shape="circle"
                          style={{ width: 70, height: 70 }}
@@ -217,7 +217,7 @@ const Navigation = () => {
                <div className="flex justify-content-center">
                     <Menu model={menuItemsProfile} popup ref={menuLeft} id="popup-avatar-profile" />
                     <Avatar
-                         image={userLoggedData?.userData.imageProfilePath}
+                         image={userLoggedData?.userData.secure_url}
                          id="avatar"
                          shape="circle"
                          label="Show Left"

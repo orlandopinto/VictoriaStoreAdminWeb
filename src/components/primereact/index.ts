@@ -20,6 +20,20 @@ export * from 'primereact/inputtextarea';
 export * from 'primereact/message';
 export * from 'primereact/stepperpanel';
 export * from 'primereact/tabview';
-//export * from 'primereact/toast';
+export * from 'primereact/tag';
+export * from 'primereact/tooltip';
+export * from "primereact/iconfield";
+export * from "primereact/inputicon";
+export * from 'primereact/inputmask';
+export * from "primereact/inputswitch";
+export * from "primereact/inputtext";
+export * from "primereact/multiselect";
+export * from "primereact/confirmdialog";
+export * from "primereact/datatable";
+export * from "primereact/button";
+export * from "primereact/column";
+
 //NOTA: NO se puede exportar primereact/api
+//export * from 'primereact/toast';
 //export * from "primereact/api";
+//export * from "primereact/sidebar";

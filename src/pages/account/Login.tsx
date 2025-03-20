@@ -71,9 +71,15 @@ function Login() {
                storeSessionData(userDataToken, permissionsByRole);
                navigate('/dashboard')
           } catch (error) {
+               if (error instanceof AxiosError) {
+                    const handledError = (error as AxiosError)//.response?.data as Record<string, string>;
+                    errorAlert(handledError.message);
+               }
+               else {
+                    const err = error as Error
+                    errorAlert(err.message);
+               }
                setLoading(false);
-               const handledError = (error as AxiosError).response?.data as Record<string, string>;
-               errorAlert(handledError.error);
           }
           finally {
                setLoading(false);

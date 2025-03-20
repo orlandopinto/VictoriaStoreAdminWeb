@@ -11,7 +11,8 @@ export type UserData = {
      firstName: any
      lastName: any
      phoneNumber: any
-     imageProfilePath: any
+     public_id: any
+     secure_url: any
      city: any
      zipcode: any
      lockoutEnabled: any
@@ -30,7 +31,8 @@ export type RegisterUser = {
      firstName: string
      lastName: string
      phoneNumber: string
-     imageProfilePath: string
+     public_id: string
+     secure_url: string
      city: string | null
      zipcode: number | null
      lockoutEnabled: boolean
@@ -39,4 +41,26 @@ export type RegisterUser = {
      birthDate: Date | null
      roles: string[] | []
      isActive: boolean
+}
+
+export type UpdateUser = {
+     id: string;
+     address?: string;
+     firstName?: string;
+     lastName?: string;
+     phoneNumber?: string;
+     public_id?: string;
+     secure_url?: string;
+     city?: string;
+     zipcode?: number;
+     lockoutEnabled?: boolean;
+     accessFailedCount?: number;
+     birthDate?: Date;
+     roles?: string[];
+     isActive?: boolean
+}
+
+export type ChangePassword = {
+     email: string;
+     newPassword: string;
 }

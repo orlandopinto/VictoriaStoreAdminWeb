@@ -1,48 +1,44 @@
-import { AxiosError } from "axios";
 import { toPng } from 'html-to-image';
 import { FilterMatchMode } from "primereact/api";
-import { Button } from "primereact/button";
-import { Column } from "primereact/column";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
-import { DataTable, DataTableFilterMeta } from "primereact/datatable";
-import { IconField } from "primereact/iconfield";
-import { InputIcon } from "primereact/inputicon";
-import { InputText } from "primereact/inputtext";
-import { MultiSelect } from "primereact/multiselect";
 import { Sidebar } from "primereact/sidebar";
-import { Tag } from "primereact/tag";
 import { Toast } from "primereact/toast";
-import { Tooltip } from 'primereact/tooltip';
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Button, Column, confirmDialog, ConfirmDialog, DataTable, DataTableFilterMeta, IconField, InputIcon, InputMask, InputSwitch, InputText, MultiSelect, MultiSelectChangeEvent, TabPanel, TabView, Tag, Tooltip } from "../../components/primereact";
 import { ACTIONS } from "../../config/constants.d";
 import { RoleController, UserController } from "../../controllers";
 import { useAuth } from "../../hooks";
-import { PermissionsByRole, Role, UserData } from "../../types";
+import { ChangePassword, PermissionsByRole, RegisterUser, Role, UpdateUser, UserData } from "../../types";
 import { CloudinaryResult } from "../../types/cloudinary-result.type";
 import { ApiResultResponse } from '../../types/environment-response.type';
-import { RegisterUser } from '../../types/user-data.type';
 import { Validators } from "../../utils";
 import { Helpers } from "../../utils/Helpers";
 import ProfileImage from "./ProfileImage";
-import { InputMask } from 'primereact/inputmask';
-import { Divider } from "primereact/divider";
-import { InputSwitch } from "primereact/inputswitch";
 
 const UsersDataTable = () => {
 
      //..:: [ TYPES AND VARIABLES ] ::..
      type FilterRoleList = {
-          id: string,
+          _id: string,
           roleName: string
      }
      const imageProfileRef = useRef<HTMLSpanElement | null>(null);
+
+     //NEW USER
      const inputTextFirstNameRef = useRef<HTMLInputElement | null>(null);
      const inputTextLastNameRef = useRef<HTMLInputElement | null>(null);
      const inputTextEmailRef = useRef<HTMLInputElement | null>(null);
      const inputTextPhoneNumberRef = useRef<InputMask | null>(null);
      const inputTextPasswordRef = useRef<HTMLInputElement | null>(null);
      const inputTextConfirmPasswordRef = useRef<HTMLInputElement | null>(null);
+
+     //EDIT USER
+     const inputTextEditFirstNameRef = useRef<HTMLInputElement | null>(null);
+     const inputTextEditLastNameRef = useRef<HTMLInputElement | null>(null);
+     const inputTexEditPhoneNumberRef = useRef<InputMask | null>(null);
+     const inputTextEditPasswordRef = useRef<HTMLInputElement | null>(null);
+     const inputTextEditConfirmPasswordRef = useRef<HTMLInputElement | null>(null);
+
      const profileImageBackgroundColors = ['#ffc75f', '#845ec2', '#d65db1', '#ff6f91', '#ff9671', '#2c73d2', '#0081cf', '#0089ba', '#008e9b', '#008f7a', '#4d8076', '#4b4453', '#b0a8b9', '#c34a36', '#4e8397']
 
      //..:: [ HOOKS ] ::..
@@ -52,14 +48,15 @@ const UsersDataTable = () => {
 
      //..:: [ STATES ] ::..
      const [userList, setUserList] = useState<UserData[]>([])
-     const [roleList, setRoleList] = useState<Role[]>([])
+     const [roleList, setRoleList] = useState<FilterRoleList[]>([] as FilterRoleList[])
      const [permissionsByRole, setPermissionsByRole] = useState([] as PermissionsByRole[])
      const [loading, setLoading] = useState<boolean>(true);
      const [, setVisibleRight] = useState<boolean>(false);
      const [overlayVisible, setOverlayVisible] = useState<boolean>(false);
      const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
      const [showOverlayAlertModal, setShowOverlayAlertModal] = useState(false);
-     const [showDeleteRoleModal, setShowDeleteRoleModal] = useState(false);
+     const [userSelectedToDelete, setUserSelectedToDelete] = useState<UserData>({} as UserData)
+     const [showDeleteUserModal, setShowDeleteUserModal] = useState(false);
      const [filterRoleList, setFilterRoleList] = useState<FilterRoleList[]>([]);
      const [profileName, setProfileName] = useState<[string, string]>(['?', '']);
      const [filters, setFilters] = useState<DataTableFilterMeta>({
@@ -75,6 +72,10 @@ const UsersDataTable = () => {
      const [userDataToEdit, setUserDataToEdit] = useState<UserData>({} as UserData);
      const [activeUserSwitch, setActiveUserSwitch] = useState(false);
      const [changeToLoginSwitch, setChangeToLoginSwitch] = useState(true);
+     const [editFirstName, setEditFirstName] = useState('');
+     const [editLastName, setEditLastName] = useState('');
+     const [editPassword, setEditPassword] = useState('');
+     const [editConfirmPassword, setEditConfirmPassword] = useState('');
 
      useEffect(() => {
           getData()
@@ -103,11 +104,7 @@ const UsersDataTable = () => {
                setUserList(data as unknown as UserData[]);
           } catch (err) {
                console.log('error: ', err)
-               const error = err as unknown as AxiosError
-               const errorMessage = (error?.response?.data as any)
-               if (errorMessage.message === 'Invalid Bearer token') {
-                    alertModal();
-               }
+               alertModal(err);
           }
      }
 
@@ -121,17 +118,13 @@ const UsersDataTable = () => {
                const data = await controller.GetRoles() as unknown as ApiResultResponse;
                let filterRoleList: FilterRoleList[] = []
                for (const role of (data.data as unknown as Role[])) {
-                    filterRoleList.push({ roleName: role.roleName, id: role.id as string });
+                    filterRoleList.push({ roleName: role.roleName, _id: role._id as string });
                }
                setFilterRoleList(filterRoleList);
 
           } catch (err) {
                console.log('error: ', err)
-               const error = err as unknown as AxiosError
-               const errorMessage = (error?.response?.data as any).error
-               if (errorMessage === 'Invalid Bearer token') {
-                    alertModal();
-               }
+               alertModal(err);
           }
      }
 
@@ -168,18 +161,6 @@ const UsersDataTable = () => {
           setGlobalFilterValue(value);
      };
 
-     const deleteAlertConfirm = () => {
-          confirmDialog({
-               group: 'delete',
-               message: 'Are you sure you want to proceed?',
-               header: 'Confirmation',
-               icon: 'pi pi-exclamation-triangle',
-               defaultFocus: 'accept',
-               //accept,
-               //reject
-          });
-     };
-
      const initRegisterUserValues = (isCancel?: boolean) => {
           [
                inputTextFirstNameRef,
@@ -192,10 +173,12 @@ const UsersDataTable = () => {
                if (ref.current) (ref.current as unknown as HTMLInputElement).value = "";
           });
           setProfileName(['?', '']);
+          setEditFirstName('');
+          setEditLastName('');
           if (!isCancel)
                setProfileImageBackgroundColor(profileImageBackgroundColors[Helpers.RandomNumber(0, profileImageBackgroundColors.length)]);
 
-          setRoleList([] as Role[]);
+          setRoleList([]);
      }
 
      const openOverlay = (isEdit: boolean = false) => {
@@ -228,14 +211,18 @@ const UsersDataTable = () => {
                          openOverlay(true);
                          setActiveUserSwitch(user.isActive);
                          setUserDataToEdit(user);
-                         const lista: Role[] = [];
+                         const roleByUserList: FilterRoleList[] = [];
                          for (const role of user.roles) {
                               const foundRole = filterRoleList.find(f => f.roleName === role)
-                              lista.push({ id: foundRole?.id!, roleName: foundRole?.roleName!, roleDescription: "" });
+                              roleByUserList.push({ _id: foundRole?._id!, roleName: foundRole?.roleName! })
                          }
-                         setRoleList(lista);
+                         setRoleList(roleByUserList);
                     }} />}
-                    {permissionsByRole.length > 0 && hasAction(ACTIONS.DELETE) && user.firstName !== 'Administrator' && <Button icon="pi pi-trash" tooltip="Delete" rounded text tooltipOptions={{ position: 'top' }} onClick={deleteAlertConfirm} />}
+                    {permissionsByRole.length > 0 && hasAction(ACTIONS.DELETE) && user.firstName !== 'Administrator' && <Button icon="pi pi-trash" tooltip="Delete" rounded text tooltipOptions={{ position: 'top' }}
+                         onClick={() => {
+                              setUserSelectedToDelete(user)
+                              setShowDeleteUserModal(true)
+                         }} />}
                </div>
           );
      }
@@ -252,7 +239,7 @@ const UsersDataTable = () => {
      const userNameBodyTemplate = (user: UserData) => {
           return (
                <div className="flex align-items-center gap-2">
-                    <img alt={user.imageProfilePath} src={user.imageProfilePath} style={{ width: '28px' }} />
+                    <img alt={user.secure_url} src={user.secure_url} style={{ width: '28px' }} />
                     <span>{user.firstName} {user.lastName}</span>
                </div>
           );
@@ -268,8 +255,8 @@ const UsersDataTable = () => {
 
      const customHeader = () => {
           return (
-               <div className="flex justify-content-center w-full">
-                    <span className="font-bold">{isEdit ? "EDIT USER" : "REGISTER USER"}</span>
+               <div className="pl-3 w-full">
+                    <span className="font-bold">{isEdit ? "EDIT USER" : "NEW USER"}</span>
                </div>
           )
      }
@@ -278,25 +265,20 @@ const UsersDataTable = () => {
 
           try {
 
-               // const controller = new PageController(getToken());
-               // const result = await controller.DeletePage(selectedPage) as unknown as ApiResultResponse
-               // if (result.hasError) {
-               //      const err = new Error(result.message);
-               //      alertModal(err);
-               //      return;
-               // }
-               // toast.current?.show({ severity: 'success', summary: 'Confirmed', detail: result.message, life: 3000 });
-               // setPageList(pageList.filter(f => f.pageName !== selectedPage.pageName));
-               // let permissionsProfileStateListTmp = getPermissionsProfileStateList().filter(f => f.permissionsByRole.map((p) => p.pageName !== selectedPage.pageName))
-               // updatePermissionsProfile([...permissionsProfileStateListTmp]);
-               // setSelectedPage({} as Page);
+               const controller = new UserController(userLoggedData!);
+               const result = await controller.Delete(userSelectedToDelete) as unknown as ApiResultResponse
+               if (result.hasError) {
+                    const err = new Error(result.message);
+                    alertModal(err);
+                    return;
+               }
+               toast.current?.show({ severity: 'success', summary: 'Deleted', detail: result.message, life: 3000 });
+               setUserList(userList.filter(f => f._id !== userSelectedToDelete._id!));
+               setOverlayVisible(false);
 
           } catch (err) {
                console.log('error: ', err)
-               const error = err as unknown as AxiosError
-               const errorMessage = (error?.response?.data as any).error
-               if (errorMessage === 'Invalid Bearer token')
-                    alertModal();
+               alertModal(err);
           }
      }
 
@@ -326,13 +308,13 @@ const UsersDataTable = () => {
                formData.append("file", dataTransfer.files[0]);
                const result = await controller.UploadImage(formData) as unknown as CloudinaryResult;
                return result;
-          } catch (error) {
-               console.log('error: ', error)
-               return undefined;
+          } catch (err) {
+               console.log('error: ', err)
+               alertModal(err);
           }
      }
 
-     function allFieldsValid(formElements: HTMLFormControlsCollection): boolean {
+     const allFieldsValid = (formElements: HTMLFormControlsCollection): boolean => {
           let counterInvalidFields = 0;
           for (const htmlElement of formElements) {
                let currentElement = htmlElement as unknown as HTMLElement;
@@ -359,9 +341,7 @@ const UsersDataTable = () => {
      const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
           event.preventDefault();
           const form = event.currentTarget;
-          const formElements = form.elements as typeof form.elements & {
-               email: { value: string }
-          };
+          const formElements = form.elements as typeof form.elements & { email: { value: string } };
 
           if (!allFieldsValid(formElements)) return;
 
@@ -370,52 +350,48 @@ const UsersDataTable = () => {
           const password = document.getElementById('password') as HTMLInputElement;
           const confirmPassword = document.getElementById('confirmPassword') as HTMLInputElement;
 
-          let hasErrors = false;
+          const emailValid = Validators.email.test(formElements.email.value);
+          const passwordsMatch = password.value === confirmPassword.value;
 
-          if (!Validators.email.test(formElements.email.value)) {
-               emailErrorMessage.classList.remove('d-none');
-               hasErrors = true;
-          } else
-               emailErrorMessage.classList.add('d-none');
+          emailErrorMessage.classList.toggle('d-none', emailValid);
+          passwordsErrorMessage.classList.toggle('d-none', passwordsMatch);
 
-          if (password.value !== confirmPassword.value) {
-               passwordsErrorMessage.classList.remove('d-none');
-               hasErrors = true;
-          } else
-               passwordsErrorMessage.classList.add('d-none');
-
-          if (userList.some(user => user.email === inputTextEmailRef.current?.value)) {
-               alertModal(new Error('User already exists'));
-               hasErrors = true;
-          }
-
-          if (!hasErrors) RegisterUser();
+          if (emailValid && passwordsMatch) createNewUser();
      }
 
      const handleEditSubmit = (event: FormEvent<HTMLFormElement>) => {
           event.preventDefault();
+          updateUser();
      }
 
      const validateEmailOnBlur = () => {
-          const email = document.getElementById('email') as unknown as HTMLInputElement
-          const emailErrorMessage = document.getElementById('email-error-message') as unknown as HTMLElement
-          if (!Validators.email.test(email.value))
-               emailErrorMessage.classList.remove('d-none');
-          else
-               emailErrorMessage.classList.add('d-none');
+          const email = document.getElementById('email') as HTMLInputElement;
+          const emailErrorMessage = document.getElementById('email-error-message') as HTMLElement;
+          emailErrorMessage.classList.toggle('d-none', Validators.email.test(email.value));
      }
 
      const validatePasswordsOnBlur = () => {
-          const password = document.getElementById('password') as unknown as HTMLInputElement
-          const confirmPassword = document.getElementById('confirmPassword') as unknown as HTMLInputElement
-          const passwordsErrorMessage = document.getElementById('passwords-error-message') as unknown as HTMLElement
-          if (password.value !== confirmPassword.value)
-               passwordsErrorMessage.classList.remove('d-none');
-          else
-               passwordsErrorMessage.classList.add('d-none');
+          const password = document.getElementById('password') as HTMLInputElement;
+          const confirmPassword = document.getElementById('confirmPassword') as HTMLInputElement;
+          const passwordsErrorMessage = document.getElementById('passwords-error-message') as HTMLElement;
+          const hasErrors = password.value !== confirmPassword.value;
+          passwordsErrorMessage.classList.toggle('d-none', !hasErrors);
+          password.classList.toggle('p-invalid', hasErrors);
+          confirmPassword.classList.toggle('p-invalid', hasErrors);
      }
 
-     const RegisterUser = async () => {
+     const validateEditPasswordsOnBlur = (): boolean => {
+          const editPassword = document.getElementById('editPassword') as HTMLInputElement;
+          const confirmEditPassword = document.getElementById('confirmEditPassword') as HTMLInputElement;
+          const passwordsErrorMessage = document.getElementById('edit-passwords-error-message') as HTMLElement;
+          const hasErrors = editPassword.value === '' || confirmEditPassword.value === '' || editPassword.value !== confirmEditPassword.value;
+          passwordsErrorMessage.classList.toggle('d-none', !hasErrors);
+          editPassword.classList.toggle('p-invalid', hasErrors);
+          confirmEditPassword.classList.toggle('p-invalid', hasErrors);
+          return hasErrors;
+     }
+
+     const createNewUser = async () => {
 
           try {
                const profileImage = await ulploadCloudinaryImage();
@@ -426,7 +402,8 @@ const UsersDataTable = () => {
                     firstName: inputTextFirstNameRef.current?.value!,
                     lastName: inputTextLastNameRef.current?.value!,
                     phoneNumber: (inputTextPhoneNumberRef.current as unknown as HTMLInputElement).value,
-                    imageProfilePath: profileImage?.secure_url!,
+                    public_id: profileImage?.public_id!,
+                    secure_url: profileImage?.secure_url!,
                     city: null,
                     zipcode: null,
                     lockoutEnabled: false,
@@ -436,7 +413,7 @@ const UsersDataTable = () => {
                     roles: roleList.map(f => f.roleName),
                     isActive: true
                }
-               const result = await controller.Register(user) as unknown as ApiResultResponse
+               const result = await controller.Create(user) as unknown as ApiResultResponse
                if (result.hasError) {
                     alertModal(new Error(result.message));
                     return;
@@ -445,15 +422,81 @@ const UsersDataTable = () => {
                setUserList([...userList, result.data as unknown as UserData])
                setOverlayVisible(false);
 
-          } catch (error) {
-               console.log('error: ', error);
+          } catch (err) {
+               console.log('error: ', err)
+               alertModal(err);
           }
 
      }
 
-     const multiSelectOnLoad = (e: any) => {
-          const multiSelect = document.getElementById('roles-multiselect')
-          const x = e;
+     const updateUser = async () => {
+
+          try {
+               const controller = new UserController(userLoggedData!);
+               const user: UpdateUser = {
+                    id: userDataToEdit._id!,
+                    address: userDataToEdit.address,
+                    firstName: inputTextEditFirstNameRef.current?.value!,
+                    lastName: inputTextEditLastNameRef.current?.value!,
+                    phoneNumber: (inputTexEditPhoneNumberRef.current as unknown as HTMLInputElement).value,
+                    public_id: userDataToEdit.public_id,
+                    secure_url: userDataToEdit.secure_url,
+                    city: userDataToEdit.city,
+                    zipcode: userDataToEdit.zipcode,
+                    lockoutEnabled: userDataToEdit.lockoutEnabled,
+                    accessFailedCount: userDataToEdit.accessFailedCount!,
+                    birthDate: userDataToEdit.birthDate,
+                    roles: roleList.map(f => f.roleName),
+                    isActive: activeUserSwitch
+               }
+               const result = await controller.Update(user) as unknown as ApiResultResponse
+               if (result.hasError) {
+                    alertModal(new Error(result.message));
+                    return;
+               }
+               toast.current?.show({ severity: 'success', summary: 'updated', detail: result.message, life: 3000 });
+
+               for (let usr of userList) {
+                    if (usr._id === user.id) {
+                         usr.firstName = user.firstName;
+                         usr.lastName = user.lastName;
+                         usr.phoneNumber = user.phoneNumber;
+                         usr.roles = user.roles!;
+                         usr.isActive = user.isActive!;
+                    }
+               }
+               setUserList(userList)
+               setOverlayVisible(false);
+
+          } catch (err) {
+               console.log('error: ', err)
+               alertModal(err);
+          }
+
+     }
+
+     const handleChangePasswordSubmit = (event: FormEvent<HTMLFormElement>) => {
+
+          event.preventDefault();
+          if (!validateEditPasswordsOnBlur())
+               changePassword();
+
+     }
+
+     const changePassword = async () => {
+          try {
+               const controller = new UserController(userLoggedData!);
+               const params: ChangePassword = {
+                    email: userDataToEdit.email,
+                    newPassword: inputTextEditConfirmPasswordRef.current?.value!,
+               }
+               const result = await controller.ChangePassword(params) as unknown as ApiResultResponse
+               if (result.hasError) throw new Error(result.message);
+               toast.current?.show({ severity: 'success', summary: 'updated', detail: result.message, life: 3000 });
+               setOverlayVisible(false);
+          } catch (err) {
+               alertModal(err);
+          }
      }
 
      return (
@@ -489,78 +532,121 @@ const UsersDataTable = () => {
                     {
                          isEdit
                               ?
-                              <form onSubmit={handleEditSubmit}>
+                              <>
                                    <div className="py-2 w-full flex justify-content-center">
-                                        <img src={userDataToEdit.imageProfilePath} className="user-profile-image" />
+                                        <img src={userDataToEdit.secure_url} className="user-profile-image" />
                                    </div>
                                    <div className="flex justify-content-center w-full pt-2 pb-4">
                                         <label htmlFor="email">{userDataToEdit.email}</label>
                                    </div>
-                                   <div className="gap-2 flex-auto flex flex-row">
-                                        PERSONAL DATA
-                                   </div>
-                                   <Divider />
-                                   <div className="gap-2 flex-auto flex flex-row">
-                                        <div className="flex flex-column gap-2 w-full">
-                                             <label htmlFor="firstName">First name:</label>
-                                             <InputText id="firstName" value={userDataToEdit.firstName} onChange={(e: ChangeEvent<HTMLInputElement>) => setProfileName([e.currentTarget.value, profileName[1]])} className='p-inputtext-sm w-full' aria-describedby="first-name" ref={inputTextFirstNameRef} />
-                                        </div>
-                                        <div className="flex flex-column gap-2 w-full">
-                                             <label htmlFor="lastName">Last name:</label>
-                                             <InputText id="lastName" value={userDataToEdit.lastName} onChange={(e: ChangeEvent<HTMLInputElement>) => setProfileName([profileName[0], e.currentTarget.value])} className='p-inputtext-sm w-full' aria-describedby="last-name" ref={inputTextLastNameRef} />
-                                        </div>
-                                   </div>
-                                   <div className="gap-2 flex-auto flex flex-row pt-3">
-                                        <div className="flex flex-column gap-2 w-full">
-                                             <label htmlFor="phoneNumber">Phone number:</label>
-                                             <InputMask id="phoneNumber" value={userDataToEdit.phoneNumber} mask="999 99 99 99" placeholder="___ __ __ __" className='p-inputtext-sm w-full' aria-describedby="phone-number" ref={inputTextPhoneNumberRef} />
-                                        </div>
-                                   </div>
-                                   <div className="gap-2 flex-auto flex flex-row pt-3">
-                                        <div className="flex flex-column gap-2 w-full">
-                                             <label htmlFor="role">Roles:</label>
-                                             <MultiSelect id="roles-multiselect" value={roleList} onBlur={(e) => multiSelectOnLoad(e)} onChange={(e) => setRoleList(e.value)} options={filterRoleList} optionLabel="roleName" placeholder="Select role" maxSelectedLabels={3} className="w-full" />
-                                        </div>
-                                   </div>
-                                   <div className="gap-2 flex justify-content-end  pt-4">
-                                        {activeUserSwitch ? <div style={{ width: '120px' }}>Deshabilitar usuario</div> : <div style={{ width: '120px' }}>Habilitar usuario</div>}
-                                        <div><InputSwitch checked={activeUserSwitch} onChange={(e) => setActiveUserSwitch(e.value)} /></div>
-                                   </div>
-                                   <div className="gap-2 flex-auto flex flex-row pt-3">
-                                        RESET PASSWORD
-                                   </div>
-                                   <Divider />
-                                   <div className="gap-2 flex-auto flex flex-row ">
-                                        <div className="flex flex-column gap-2 w-full">
-                                             <label htmlFor="password">Password:</label>
-                                             <InputText id="password" type="password" value={userDataToEdit.password} className='p-inputtext-sm w-full' ref={inputTextPasswordRef} autoComplete="new-password" style={{ height: '2.4rem' }} />
-                                        </div>
-                                        <div className="flex flex-column gap-2 w-full">
-                                             <label htmlFor="confirmPassword">Confirm password:</label>
-                                             <InputText id="confirmPassword" type="password" value={userDataToEdit.password} className='p-inputtext-sm w-full' ref={inputTextConfirmPasswordRef} onBlur={validatePasswordsOnBlur} />
-                                        </div>
-                                   </div>
-                                   <div className="w-full pb-3">
-                                        <small id="passwords-error-message" className="invalid-text-color d-none">
-                                             Password and Confirm password doesn't match.
-                                        </small>
-                                   </div>
-                                   <div className="gap-2 flex pt-4">
-                                        <div><InputSwitch checked={changeToLoginSwitch} onChange={(e) => setChangeToLoginSwitch(e.value)} /></div>
-                                        <div>Cambiar contraseña al iniciar sesión</div>
-                                   </div>
-                                   <div className="absolute bottom-0 p-2 w-full gap-2 justify-content-endabsolute bottom-0  w-full gap-2 flex justify-content-end pr-6 pb-3">
-                                        <div>
-                                             <Button id="btnCancel" type="button" label="Cancel" outlined severity="secondary" className="w-7rem" onClick={() => {
-                                                  initRegisterUserValues(true);
-                                                  setOverlayVisible(false);
-                                             }} />
-                                        </div>
-                                        <div>
-                                             <Button id="btnSaveUser" type="submit" label="Actualizar" className="w-7rem" />
-                                        </div>
-                                   </div>
-                              </form>
+                                   <TabView>
+                                        <TabPanel header="User data">
+                                             <form onSubmit={handleEditSubmit}>
+                                                  <div className="gap-2 flex-auto flex flex-row">
+                                                       <div className="flex flex-column gap-2 w-full">
+                                                            <label htmlFor="editFirstName">First name:</label>
+                                                            <InputText
+                                                                 id="editFirstName"
+                                                                 ref={inputTextEditFirstNameRef}
+                                                                 value={editFirstName || userDataToEdit.firstName}
+                                                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditFirstName(e.currentTarget.value)}
+                                                                 className='p-inputtext-sm w-full'
+                                                                 aria-describedby="edit-first-name"
+                                                            />
+                                                       </div>
+                                                       <div className="flex flex-column gap-2 w-full">
+                                                            <label htmlFor="lastName">Last name:</label>
+                                                            <InputText
+                                                                 id="editLastName"
+                                                                 ref={inputTextEditLastNameRef}
+                                                                 value={editLastName || userDataToEdit.lastName}
+                                                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditLastName(e.currentTarget.value)}
+                                                                 className='p-inputtext-sm w-full'
+                                                                 aria-describedby="last-name"
+                                                            />
+                                                       </div>
+                                                  </div>
+                                                  <div className="gap-2 flex-auto flex flex-row pt-3">
+                                                       <div className="flex flex-column gap-2 w-full">
+                                                            <label htmlFor="editPhoneNumber">Phone number:</label>
+                                                            <InputMask id="editPhoneNumber" value={userDataToEdit.phoneNumber} ref={inputTexEditPhoneNumberRef} mask="999 99 99 99" placeholder="___ __ __ __" className='p-inputtext-sm w-full' aria-describedby="phone-number" />
+                                                       </div>
+                                                  </div>
+                                                  <div className="gap-2 flex-auto flex flex-row pt-3">
+                                                       <div className="flex flex-column gap-2 w-full">
+                                                            <label htmlFor="role">Roles:</label>
+                                                            <MultiSelect id="roles-multiselect" value={roleList} onChange={(e: MultiSelectChangeEvent) => setRoleList(e.value)} options={filterRoleList} optionLabel="roleName" placeholder="Select role" maxSelectedLabels={3} className="w-full" />
+                                                       </div>
+                                                  </div>
+                                                  <div className="gap-2 flex justify-content-end pt-4">
+                                                       {activeUserSwitch ? <div style={{ width: '120px' }}>Deshabilitar usuario</div> : <div style={{ width: '120px' }}>Habilitar usuario</div>}
+                                                       <div><InputSwitch checked={activeUserSwitch} onChange={(e) => setActiveUserSwitch(e.value)} /></div>
+                                                  </div>
+                                                  <div className="absolute bottom-0 p-2 w-full gap-2 justify-content-endabsolute bottom-0  w-full gap-2 flex justify-content-end pr-6 pb-3">
+                                                       <div>
+                                                            <Button id="btnCancel" type="button" label="Cancel" outlined severity="secondary" className="w-7rem" onClick={() => {
+                                                                 initRegisterUserValues(true);
+                                                                 setOverlayVisible(false);
+                                                            }} />
+                                                       </div>
+                                                       <div>
+                                                            <Button id="btnUpdateUser" type="submit" label="Actualizar" className="w-7rem" />
+                                                       </div>
+                                                  </div>
+                                             </form>
+                                        </TabPanel>
+                                        <TabPanel header="Change Password">
+                                             <form onSubmit={handleChangePasswordSubmit}>
+                                                  <div className="reset-password-section">
+                                                       <div className="gap-2 flex-auto flex flex-row ">
+                                                            <div className="flex flex-column gap-2 w-full">
+                                                                 <label htmlFor="editPassword">Password:</label>
+                                                                 <InputText
+                                                                      id="editPassword"
+                                                                      type="password"
+                                                                      value={editPassword}
+                                                                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditPassword(e.currentTarget.value)}
+                                                                      className='p-inputtext-sm w-full'
+                                                                      ref={inputTextEditPasswordRef}
+                                                                      autoComplete="new-password" style={{ height: '2.4rem' }} />
+                                                            </div>
+                                                            <div className="flex flex-column gap-2 w-full">
+                                                                 <label htmlFor="confirmEditPassword">Confirm password:</label>
+                                                                 <InputText
+                                                                      id="confirmEditPassword"
+                                                                      type="password"
+                                                                      value={editConfirmPassword}
+                                                                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditConfirmPassword(e.currentTarget.value)}
+                                                                      className='p-inputtext-sm w-full'
+                                                                      ref={inputTextEditConfirmPasswordRef}
+                                                                      onBlur={validateEditPasswordsOnBlur} />
+                                                            </div>
+                                                       </div>
+                                                       <div className="w-full pb-3">
+                                                            <small id="edit-passwords-error-message" className="invalid-text-color d-none">
+                                                                 Password and Confirm password doesn't match.
+                                                            </small>
+                                                       </div>
+                                                       <div className="gap-2 flex pt-4">
+                                                            <div><InputSwitch checked={changeToLoginSwitch} onChange={(e) => setChangeToLoginSwitch(e.value)} /></div>
+                                                            <div>Cambiar contraseña al iniciar sesión</div>
+                                                       </div>
+                                                  </div>
+                                                  <div className="absolute bottom-0 p-2 w-full gap-2 justify-content-endabsolute bottom-0  w-full gap-2 flex justify-content-end pr-6 pb-3">
+                                                       <div>
+                                                            <Button id="btnCancel" type="button" label="Cancel" outlined severity="secondary" className="w-7rem" onClick={() => {
+                                                                 initRegisterUserValues(true);
+                                                                 setOverlayVisible(false);
+                                                            }} />
+                                                       </div>
+                                                       <div>
+                                                            <Button id="btnSaveUser" type="submit" label="Change password" />
+                                                       </div>
+                                                  </div>
+                                             </form>
+                                        </TabPanel>
+                                   </TabView>
+                              </>
                               :
                               <form onSubmit={handleSubmit}>
                                    <div className="pt-4 pb-6 w-full flex justify-content-center">
@@ -648,10 +734,10 @@ const UsersDataTable = () => {
                />
                <ConfirmDialog
                     id="ConfirmDialogDelete"
-                    group="declarative"
-                    visible={showDeleteRoleModal}
-                    onHide={() => setShowDeleteRoleModal(false)}
-                    message={`Are you sure you want to proceed to delete this user?`}
+                    group="ConfirmDialogDelete"
+                    visible={showDeleteUserModal}
+                    onHide={() => setShowDeleteUserModal(false)}
+                    message={`Are you sure you want to proceed to delete the "${userSelectedToDelete.firstName} ${userSelectedToDelete.firstName}" user?`}
                     header="Confirmation"
                     icon="pi pi-exclamation-triangle"
                     acceptLabel="Eliminar"

@@ -182,7 +182,7 @@ const IndexRoles = () => {
           useEffect(() => {
                if (userStore.role) {
                     if (userStore.role.roleName)
-                         setFormData({ id: userStore.role.id, roleName: userStore.role.roleName, roleDescription: userStore.role.roleDescription });
+                         setFormData({ _id: userStore.role._id, roleName: userStore.role.roleName, roleDescription: userStore.role.roleDescription });
                }
           }, []);
 
@@ -205,7 +205,7 @@ const IndexRoles = () => {
                     setTimeout(() => setShowRoleNameMessage(false), 3000);
                     return;
                }
-               userStore.role = { id: formData.id, roleName: formData.roleName, roleDescription: formData.roleDescription } as Role;
+               userStore.role = { _id: formData._id, roleName: formData.roleName, roleDescription: formData.roleDescription } as Role;
                stepperRef.current?.nextCallback()
           }
 
@@ -306,7 +306,7 @@ const IndexRoles = () => {
                               actionId: action._id,
                               actionName: action.actionName,
                               pageId: page._id,
-                              roleId: userStore.role.id,
+                              roleId: userStore.role._id,
                               roleName: userStore.role.roleName
                          }))
                     ]
@@ -359,7 +359,7 @@ const IndexRoles = () => {
                                                                            actionId: action._id,
                                                                            actionName: action.actionName,
                                                                            pageId: page._id,
-                                                                           roleId: userStore.role.id,
+                                                                           roleId: userStore.role._id,
                                                                            roleName: userStore.role.roleName
                                                                       }
                                                                  )}
@@ -417,7 +417,7 @@ const IndexRoles = () => {
           const itemTemplate = (item: UserData) => {
                return (
                     <div className="flex flex-wrap p-2 align-items-center gap-3">
-                         <img className="w-3rem shadow-2 flex-shrink-0 border-round" src={item.imageProfilePath} alt={item.email} />
+                         <img className="w-3rem shadow-2 flex-shrink-0 border-round" src={item.secure_url} alt={item.email} />
                          <div className="flex-1 flex flex-column gap-2">
                               <span className="font-bold">{`${item.firstName} ${item.lastName}`}</span>
                               <div className="flex align-items-center gap-2"><span>{item.email}</span></div>
@@ -462,7 +462,7 @@ const IndexRoles = () => {
           const usersByRoleListTemplate = (item: UsersByRole) => {
                return (
                     <div className="flex flex-wrap p-2 align-items-center gap-3">
-                         <img className="w-3rem shadow-2 flex-shrink-0 border-round" src={item.imageProfilePath ?? DEFAULT_USER_IMAGE} alt={item.email} />
+                         <img className="w-3rem shadow-2 flex-shrink-0 border-round" src={item.secure_url ?? DEFAULT_USER_IMAGE} alt={item.email} />
                          <div className="flex-1 flex flex-column gap-2">
                               <span className="font-bold">{`${item.firstName} ${item.lastName}`}</span>
                               <div className="flex align-items-center gap-2"><span>{item.email}</span></div>
@@ -698,7 +698,7 @@ const IndexRoles = () => {
 
                          const controller = new PermissionController(userLoggedData!);
                          if (!isEditing)
-                              userStore.role.id = "67a3566daec1565315b5a9c2"
+                              userStore.role._id = "67a3566daec1565315b5a9c2"
 
                          const result = isEditing ? await controller.Update(userStore) as unknown as ApiResultResponse : await controller.Save(userStore) as unknown as ApiResultResponse
 
@@ -754,7 +754,7 @@ const IndexRoles = () => {
                          }
 
                          const controller = new RoleController(userLoggedData!);
-                         const result = await controller.AddRole({ id: "67a3566daec1565315b5a9c2", roleName: roleNameInputText.value, roleDescription: roleDescriptionInputText.value }) as unknown as ApiResultResponse;
+                         const result = await controller.AddRole({ _id: "67a3566daec1565315b5a9c2", roleName: roleNameInputText.value, roleDescription: roleDescriptionInputText.value }) as unknown as ApiResultResponse;
 
                          if (result.hasError) {
                               alertModal(new Error(result.message));

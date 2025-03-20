@@ -1,6 +1,6 @@
 import axios, { AxiosHeaders, AxiosInstance } from "axios";
 import { _Headers, IMAGE_UPLOAD_ENDPOINT, METHOD, REFRESH_TOKEN_ENDPOINT, URL_BASE } from "../config/constants.d";
-import { ApiResultResponse, RefreshTokenType, UserDataToken } from "../types";
+import { ApiResultResponse, ChangePassword, RefreshTokenType, UserDataToken } from "../types";
 
 export default class AppService {
      headers: _Headers = new Headers();
@@ -153,6 +153,27 @@ export default class AppService {
                return result
           } catch (error) {
                throw error
+          }
+
+     }
+
+     public async ChangePassword(data: ChangePassword): Promise<string> {
+
+          try {
+               const result = await this.api({
+                    url: this.ENDPOINT,
+                    method: METHOD.POST,
+                    headers: this.headers as AxiosHeaders,
+                    data: JSON.stringify(data)
+               })
+                    .then(res => res.data)
+                    .catch(err => {
+                         throw err
+                    });
+
+               return result;
+          } catch (error) {
+               throw error;
           }
 
      }

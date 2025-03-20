@@ -49,10 +49,8 @@ const IndexUser = () => {
           } catch (err) {
                console.log('error: ', err)
                const error = err as unknown as AxiosError
-               const errorMessage = (error?.response?.data as any).error
-               if (errorMessage === 'Invalid Bearer token') {
+               if (error.message.includes('accessToken'))
                     alertModal();
-               }
           }
      }
 

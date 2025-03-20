@@ -1,5 +1,5 @@
 export type Role = {
-     id: string | null
+     _id: string | null
      roleName: string
      roleDescription: string | null
      createdAt?: Date | null
@@ -20,7 +20,7 @@ export type UsersByRole = {
      email: string,
      firstName: string,
      lastName: string,
-     imageProfilePath: string | null
+     secure_url: string | null
 }
 
 export type PermissionsByRole = {
