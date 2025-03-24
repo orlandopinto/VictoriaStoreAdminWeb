@@ -1,0 +1,48 @@
+.p-datatable-header,
+.p-card-content {
+     padding-top: 0 !important;
+}
+
+.dt-categories>.p-datatable-wrapper>.p-datatable-table {
+     border: 1px solid var(--surface-200);
+     border-radius: 5px;
+}
+
+.dt-categories>.p-datatable-header {
+     border-bottom: none;
+}
+
+.dt-categories>.p-datatable-wrapper {
+     border-bottom: 1px solid transparent;
+}
+
+.dt-categories>.p-datatable-header {
+     border-bottom: none;
+     padding: 1rem 0.5rem !important;
+}
+
+.dt-categories>.p-datatable-wrapper>.p-datatable-table {
+     border-bottom: none;
+}
+
+.dt-categories>.p-datatable-wrapper {
+     -webkit-action-box-shadow: 4px 6px 5px -6px rgba(0, 0, 0, 0.2);
+     -moz-action-box-shadow: 4px 6px 5px -6px rgba(0, 0, 0, 0.2);
+     action-box-shadow: 4px 6px 5px -6px rgba(0, 0, 0, 0.2);
+}
+
+.p-fileupload .p-fileupload-content {
+     padding: 0;
+}
+
+.overlay-sub-categories>.p-sidebar-content {
+     margin-bottom: 5rem;
+}
+
+.overlay-sub-categories>.p-sidebar-header {
+     flex-direction: row-reverse;
+}
+
+.invalid-text-color {
+     color: red;
+}

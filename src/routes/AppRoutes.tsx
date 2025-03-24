@@ -12,6 +12,8 @@ import Statistics from "../pages/statistics/Statistics";
 import Taxes from "../pages/taxes/Taxes";
 import IndexUser from "../pages/users/Index";
 import ProtectedRoute from "./ProtectedRoute";
+import IndexCategories from "../pages/categories/Index";
+import IndexSubCategories from "../pages/sub-categories/Index";
 
 const AppRoutes = () => {
      return createBrowserRouter([
@@ -34,6 +36,14 @@ const AppRoutes = () => {
                     },
                     {
                          element: <ProtectedRoute pageName="taxes" />,
+                         children: [{ path: '/categories', element: <Layout><IndexCategories /></Layout > }]
+                    },
+                    {
+                         element: <ProtectedRoute pageName="taxes" />,
+                         children: [{ path: '/subcategories', element: <Layout><IndexSubCategories /></Layout > }]
+                    },
+                    {
+                         element: <ProtectedRoute pageName="taxes" />,
                          children: [{ path: '/taxes', element: <Layout><Taxes /></Layout > }]
                     },
                     {
@@ -42,7 +52,9 @@ const AppRoutes = () => {
                     },
                     {
                          element: <ProtectedRoute pageName="statistics" />,
-                         children: [{ path: '/statistics', element: <Layout><Statistics /></Layout > }]
+                         children: [{
+                              path: '/statistics', element: <Layout><Statistics /></Layout >
+                         }]
                     }
                ],
           },

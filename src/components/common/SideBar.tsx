@@ -53,75 +53,68 @@ export default function SideBar({ visible, setVisible }: Props) {
                                                                  </Link>
                                                             </li>
                                                             <li>
-                                                                 <Link to="/taxes" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                                                                      <i className="pi pi-wallet mr-2"></i>
-                                                                      <span className="font-medium">Taxes</span>
-                                                                      <Ripple />
-                                                                 </Link>
-                                                            </li>
-                                                            <li>
-                                                                 <Link to="/discounts" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                                                                      <i className="pi pi-money-bill mr-2"></i>
-                                                                      <span className="font-medium">Discounts</span>
-                                                                      <Ripple />
-                                                                 </Link>
-                                                            </li>
-                                                            <li>
-                                                                 <Link to="/users" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                                                                      <i className="pi pi-users mr-2"></i>
-                                                                      <span className="font-medium">Users</span>
-                                                                      <Ripple />
-                                                                 </Link>
-                                                            </li>
-                                                            <li>
-                                                                 <Link to="/roles" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                                                                      <i className="pi pi-lock mr-2"></i>
-                                                                      <span className="font-medium">Roles and Permissions</span>
-                                                                      <Ripple />
-                                                                 </Link>
-                                                            </li>
-                                                            <li>
                                                                  <StyleClass nodeRef={btnRef2} selector="@next" enterFromClassName="hidden" enterActiveClassName="slidedown" leaveToClassName="hidden" leaveActiveClassName="slideup">
                                                                       <a ref={btnRef2} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                                                                           <i className="pi pi-chart-line mr-2"></i>
-                                                                           <span className="font-medium">Reports</span>
+                                                                           <i className="pi pi-cog mr-2"></i>
+                                                                           <span className="font-medium">User Administration</span>
                                                                            <i className="pi pi-chevron-down ml-auto mr-1"></i>
                                                                            <Ripple />
                                                                       </a>
                                                                  </StyleClass>
                                                                  <ul className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
                                                                       <li>
-                                                                           <StyleClass nodeRef={btnRef3} selector="@next" enterFromClassName="hidden" enterActiveClassName="slidedown" leaveToClassName="hidden" leaveActiveClassName="slideup">
-                                                                                <a ref={btnRef3} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                                                                                     <i className="pi pi-chart-line mr-2"></i>
-                                                                                     <span className="font-medium">Revenue</span>
-                                                                                     <i className="pi pi-chevron-down ml-auto mr-1"></i>
-                                                                                     <Ripple />
-                                                                                </a>
-                                                                           </StyleClass>
-                                                                           <ul className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
-                                                                                <li>
-                                                                                     <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                                                                                          <i className="pi pi-table mr-2"></i>
-                                                                                          <span className="font-medium">View</span>
-                                                                                          <Ripple />
-                                                                                     </a>
-                                                                                </li>
-                                                                                <li>
-                                                                                     <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                                                                                          <i className="pi pi-search mr-2"></i>
-                                                                                          <span className="font-medium">Search</span>
-                                                                                          <Ripple />
-                                                                                     </a>
-                                                                                </li>
-                                                                           </ul>
+                                                                           <Link to="/users" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                                <i className="pi pi-users mr-2"></i>
+                                                                                <span className="font-medium">Users</span>
+                                                                                <Ripple />
+                                                                           </Link>
                                                                       </li>
                                                                       <li>
-                                                                           <a className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                                                                                <i className="pi pi-chart-line mr-2"></i>
-                                                                                <span className="font-medium">Expenses</span>
+                                                                           <Link to="/roles" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                                <i className="pi pi-lock mr-2"></i>
+                                                                                <span className="font-medium">Roles and Permissions</span>
                                                                                 <Ripple />
-                                                                           </a>
+                                                                           </Link>
+                                                                      </li>
+                                                                 </ul>
+                                                            </li>
+                                                            <li>
+                                                                 <StyleClass nodeRef={btnRef3} selector="@next" enterFromClassName="hidden" enterActiveClassName="slidedown" leaveToClassName="hidden" leaveActiveClassName="slideup">
+                                                                      <a ref={btnRef3} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                           <i className="pi pi-cog mr-2"></i>
+                                                                           <span className="font-medium">Store Administration</span>
+                                                                           <i className="pi pi-chevron-down ml-auto mr-1"></i>
+                                                                           <Ripple />
+                                                                      </a>
+                                                                 </StyleClass>
+                                                                 <ul className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
+                                                                      <li>
+                                                                           <Link to="/categories" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                                <i className="pi pi-wallet mr-2"></i>
+                                                                                <span className="font-medium">Categories</span>
+                                                                                <Ripple />
+                                                                           </Link>
+                                                                      </li>
+                                                                      <li>
+                                                                           <Link to="/subcategories" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                                <i className="pi pi-wallet mr-2"></i>
+                                                                                <span className="font-medium">Sub categories</span>
+                                                                                <Ripple />
+                                                                           </Link>
+                                                                      </li>
+                                                                      <li>
+                                                                           <Link to="/taxes" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                                <i className="pi pi-wallet mr-2"></i>
+                                                                                <span className="font-medium">Taxes</span>
+                                                                                <Ripple />
+                                                                           </Link>
+                                                                      </li>
+                                                                      <li>
+                                                                           <Link to="/discounts" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                                <i className="pi pi-money-bill mr-2"></i>
+                                                                                <span className="font-medium">Discounts</span>
+                                                                                <Ripple />
+                                                                           </Link>
                                                                       </li>
                                                                  </ul>
                                                             </li>

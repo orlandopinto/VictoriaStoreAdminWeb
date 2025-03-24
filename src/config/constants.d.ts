@@ -12,10 +12,16 @@ export const ACCESS_ENDPOINT = '/api/access'
 export const PAGES_ENDPOINT = '/api/pages'
 export const ACTIONS_ENDPOINT = '/api/actions'
 export const PERMISSION_ENDPOINT = '/api/permissions'
-export const DEFAULT_USER_IMAGE = 'https://res.cloudinary.com/dtnrekavg/image/upload/v1741195879/ProductImages/lymtcvke4mmgdxhj61la.png'
+export const CATEGORY_ENDPOINT = '/api/category'
+export const SUB_CATEGORY_ENDPOINT = '/api/sub-category'
 
 //IMAGES
-export const FOLDER_TO_UPLOAD = 'ProductImages'
+export const PROFILE_FOLDER_TO_UPLOAD = 'ProfileImages'
+export const CATEGORY_FOLDER_TO_UPLOAD = 'CategoryImages'
+const CLOUDINARY_NAME = process.env.CLOUDINARY_NAME
+
+export const DEFAULT_USER_IMAGE = `https://res.cloudinary.com/${CLOUDINARY_NAME}/image/upload/v1741195879/${PROFILE_FOLDER_TO_UPLOAD}/lymtcvke4mmgdxhj61la.png`
+
 export const IMAGE_UPLOAD_ENDPOINT = '/api/upload'
 
 export const METHOD = {

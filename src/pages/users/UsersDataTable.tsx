@@ -5,14 +5,14 @@ import { Toast } from "primereact/toast";
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Column, confirmDialog, ConfirmDialog, DataTable, DataTableFilterMeta, IconField, InputIcon, InputMask, InputSwitch, InputText, MultiSelect, MultiSelectChangeEvent, TabPanel, TabView, Tag, Tooltip } from "../../components/primereact";
-import { ACTIONS } from "../../config/constants.d";
+import { ACTIONS, PROFILE_FOLDER_TO_UPLOAD } from "../../config/constants.d";
 import { RoleController, UserController } from "../../controllers";
 import { useAuth } from "../../hooks";
 import { ChangePassword, PermissionsByRole, RegisterUser, Role, UpdateUser, UserData } from "../../types";
 import { CloudinaryResult } from "../../types/cloudinary-result.type";
 import { ApiResultResponse } from '../../types/environment-response.type';
 import { Validators } from "../../utils";
-import { Helpers } from "../../utils/Helpers";
+import { Helper } from "../../utils/Helper";
 import ProfileImage from "./ProfileImage";
 
 const UsersDataTable = () => {
@@ -51,7 +51,7 @@ const UsersDataTable = () => {
      const [roleList, setRoleList] = useState<FilterRoleList[]>([] as FilterRoleList[])
      const [permissionsByRole, setPermissionsByRole] = useState([] as PermissionsByRole[])
      const [loading, setLoading] = useState<boolean>(true);
-     const [, setVisibleRight] = useState<boolean>(false);
+     //const [, setVisibleRight] = useState<boolean>(false);
      const [overlayVisible, setOverlayVisible] = useState<boolean>(false);
      const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
      const [showOverlayAlertModal, setShowOverlayAlertModal] = useState(false);
@@ -176,7 +176,7 @@ const UsersDataTable = () => {
           setEditFirstName('');
           setEditLastName('');
           if (!isCancel)
-               setProfileImageBackgroundColor(profileImageBackgroundColors[Helpers.RandomNumber(0, profileImageBackgroundColors.length)]);
+               setProfileImageBackgroundColor(profileImageBackgroundColors[Helper.RandomNumber(0, profileImageBackgroundColors.length)]);
 
           setRoleList([]);
      }
@@ -194,10 +194,10 @@ const UsersDataTable = () => {
                     <div>
                          <IconField iconPosition="left">
                               <InputIcon className="pi pi-search" />
-                              <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Buscar" className="p-inputtext-sm" />
+                              <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Buscar" className="p-inputtext-sm" style={{ width: '100%' }} />
                          </IconField>
                     </div>
-                    <div><Button icon={"pi pi-plus"} label="Nuevo usuario" className="" onClick={() => openOverlay()}></Button></div>
+                    {permissionsByRole.length > 0 && hasAction(ACTIONS.CREATE) && <div><Button icon={"pi pi-plus"} label="Nuevo usuario" className="" onClick={() => openOverlay()}></Button></div>}
                </div>
           );
      };
@@ -205,7 +205,6 @@ const UsersDataTable = () => {
      const optionsBodyTemplate = (user: UserData) => {
           return (
                <div className="flex justify-content-end gap-2">
-                    {permissionsByRole.length > 0 && hasAction(ACTIONS.EDIT) && user.firstName !== 'Administrator' && <Button icon="pi pi-lock-open" tooltip="Change password" tooltipOptions={{ position: 'top' }} rounded text onClick={() => setVisibleRight(true)} />}
                     {permissionsByRole.length > 0 && hasAction(ACTIONS.VIEW) && user.firstName !== 'Administrator' && <Button icon="pi pi-eye" tooltip="View" tooltipOptions={{ position: 'top' }} rounded text />}
                     {permissionsByRole.length > 0 && hasAction(ACTIONS.EDIT) && user.firstName !== 'Administrator' && <Button icon="pi pi-pencil" tooltip="Edit" rounded text tooltipOptions={{ position: 'top' }} onClick={() => {
                          openOverlay(true);
@@ -222,7 +221,8 @@ const UsersDataTable = () => {
                          onClick={() => {
                               setUserSelectedToDelete(user)
                               setShowDeleteUserModal(true)
-                         }} />}
+                         }} />
+                    }
                </div>
           );
      }
@@ -248,10 +248,6 @@ const UsersDataTable = () => {
      const statusBodyTemplate = (user: UserData) => {
           return user.firstName !== 'Administrator' ? (user.isActive ? <Tag value="Active" style={{ width: '60px' }} ></Tag> : <Tag severity="warning" value="Inactive" style={{ width: '60px' }}></Tag>) : ''
      }
-
-     // const redirect = () => {
-     //      logout();
-     // }
 
      const customHeader = () => {
           return (
@@ -295,7 +291,7 @@ const UsersDataTable = () => {
                          console.log(err);
                     });
 
-               const covertedFile = await Helpers.DataUrlToFile(imagen as unknown as string, `profile-image.png`);
+               const covertedFile = await Helper.DataUrlToFile(imagen as unknown as string, `profile-image.png`);
 
                let dataTransfer = new DataTransfer();
                dataTransfer.items.add(covertedFile);
@@ -306,6 +302,7 @@ const UsersDataTable = () => {
 
                let formData = new FormData();
                formData.append("file", dataTransfer.files[0]);
+               formData.append("folder", PROFILE_FOLDER_TO_UPLOAD);
                const result = await controller.UploadImage(formData) as unknown as CloudinaryResult;
                return result;
           } catch (err) {
@@ -737,7 +734,7 @@ const UsersDataTable = () => {
                     group="ConfirmDialogDelete"
                     visible={showDeleteUserModal}
                     onHide={() => setShowDeleteUserModal(false)}
-                    message={`Are you sure you want to proceed to delete the "${userSelectedToDelete.firstName} ${userSelectedToDelete.firstName}" user?`}
+                    message={`Are you sure you want to proceed to delete the "${userSelectedToDelete.firstName} ${userSelectedToDelete.lastName}" user?`}
                     header="Confirmation"
                     icon="pi pi-exclamation-triangle"
                     acceptLabel="Eliminar"

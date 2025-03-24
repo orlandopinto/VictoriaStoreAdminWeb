@@ -157,6 +157,28 @@ export default class AppService {
 
      }
 
+     public async UpdateImage(formData: FormData): Promise<string> {
+
+          try {
+               const result = await this.api({
+                    url: this.UPLOAD_IMAGE_ENDPOINT,
+                    method: METHOD.PUT,
+                    headers: this.imageHeaders as AxiosHeaders,
+                    data: formData
+               })
+                    .then(res => {
+                         return res.data
+                    })
+                    .catch(err => {
+                         throw err
+                    })
+               return result
+          } catch (error) {
+               throw error
+          }
+
+     }
+
      public async ChangePassword(data: ChangePassword): Promise<string> {
 
           try {

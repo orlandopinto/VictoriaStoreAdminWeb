@@ -1,4 +1,3 @@
-import { Avatar } from 'primereact/avatar';
 import { Badge } from 'primereact/badge';
 import { Divider } from 'primereact/divider';
 import { Menu } from 'primereact/menu';
@@ -13,6 +12,7 @@ import SwitchLanguages from './LanguageSwitcher';
 import './navigation.css';
 import SideBar from './SideBar';
 import ThemeSelection from './ThemeSelection';
+import { CLOUDINARY_NAME } from '../../config/envs.d';
 
 const Navigation = () => {
      const toast = useRef(null);
@@ -138,13 +138,8 @@ const Navigation = () => {
 
      const profileHederMenuItemRenderer = () => (
           <div className='text-center pt-2 gap'>
-               <div>
-                    <Avatar
-                         image={userLoggedData?.userData.secure_url}
-                         id="avatarFoto"
-                         shape="circle"
-                         style={{ width: 70, height: 70 }}
-                    />
+               <div className='pb-2'>
+                    <img src={`https://res.cloudinary.com/${CLOUDINARY_NAME}/image/upload/co_skyblue,e_outline/e_shadow,x_5,y_8/c_fill,g_center,h_70,w_70/${userLoggedData?.userData.public_id}`} alt="" onClick={(event) => menuLeft.current?.toggle(event)} />
                </div>
                <h5 className='my-1'>{`${userLoggedData?.userData.firstName} ${userLoggedData?.userData.lastName}`}</h5>
                <p style={{ fontSize: '.8rem' }}>{userLoggedData?.userData.roles[0]}</p>
@@ -216,17 +211,7 @@ const Navigation = () => {
                </div>
                <div className="flex justify-content-center">
                     <Menu model={menuItemsProfile} popup ref={menuLeft} id="popup-avatar-profile" />
-                    <Avatar
-                         image={userLoggedData?.userData.secure_url}
-                         id="avatar"
-                         shape="circle"
-                         label="Show Left"
-                         icon="pi pi-align-left"
-                         className="mr-2"
-                         onClick={(event) => menuLeft.current?.toggle(event)}
-                         aria-controls="popup_menu_left"
-                         aria-haspopup
-                    />
+                    <img src={`https://res.cloudinary.com/${CLOUDINARY_NAME}/image/upload/co_skyblue,e_outline/e_shadow,x_5,y_8/c_fill,g_center,h_35,w_35/${userLoggedData?.userData.public_id}`} alt="" onClick={(event) => menuLeft.current?.toggle(event)} style={{ cursor: 'pointer' }} />
                </div>
           </div>
      );

@@ -3,7 +3,6 @@ import { Sidebar } from "primereact/sidebar";
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Button, Card, confirmDialog, ConfirmDialog, Dialog } from '../../components/primereact/index';
-import { ACTIONS } from '../../config/constants.d';
 import { UserController } from "../../controllers/user.controller";
 import { useAuth } from "../../hooks";
 import { PermissionsByRole, UserData } from "../../types";
@@ -92,12 +91,7 @@ const IndexUser = () => {
                <div className='w-full pt-2 pb-3 flex justify-content-between align-items-center'>
                     <span className='text-2xl'>Users</span>
                     <div className='flex justify-content-between gap-2'>
-                         <div>
-                              {permissionsByRole.length > 0 && hasAction(ACTIONS.CREATE) && <Button icon="pi pi-plus" label="Nuevo"></Button>}
-                         </div>
-                         <div>
-                              <Button icon="pi pi-external-link" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => setDialogVisible(true)} />
-                         </div>
+                         <Button icon="pi pi-external-link" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => setDialogVisible(true)} />
                     </div>
                </div>
                <Card>

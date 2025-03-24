@@ -177,13 +177,9 @@ const IndexRoles = () => {
           const [formData, setFormData] = useState<Role>({} as Role);
           const [visibleRoleExistMessage, setVisibleRoleExistMessage] = useState<boolean>(false);
 
-          const userStore = usePermissionStore()
-
           useEffect(() => {
-               if (userStore.role) {
-                    if (userStore.role.roleName)
-                         setFormData({ _id: userStore.role._id, roleName: userStore.role.roleName, roleDescription: userStore.role.roleDescription });
-               }
+               if (userStore.role && userStore.role.roleName)
+                    setFormData({ _id: userStore.role._id, roleName: userStore.role.roleName, roleDescription: userStore.role.roleDescription });
           }, []);
 
           const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -211,6 +207,7 @@ const IndexRoles = () => {
 
           return (<div className="roles-stepper-container flex flex-column h-max">
                <div className="gap-2 p-3 flex-auto flex flex-column justify-content-start font-medium">
+                    <InputText type='hidden' id="_id" name="_id" value={formData._id} />
                     <div className='pb-2'><span className='text-3xl'>Overview</span></div>
                     <div><label>Name</label></div>
                     <div className="flex flex-row">

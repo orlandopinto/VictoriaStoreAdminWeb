@@ -4,6 +4,7 @@ import { RouterProvider } from 'react-router-dom';
 import '../src/assets/css/globalStyles.css';
 import { AuthProvider } from './context/AuthContext.tsx';
 import AppRoutes from './routes/AppRoutes.tsx';
+import ErrorBoundary from './components/common/ErrorBoundary.tsx';
 
 const value = {
   filterMatchMode: {
@@ -30,7 +31,9 @@ let root = createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <PrimeReactProvider value={value}>
     <AuthProvider>
-      <RouterProvider router={AppRoutes()} />
+      <ErrorBoundary>
+        <RouterProvider router={AppRoutes()} />
+      </ErrorBoundary>
     </AuthProvider>
   </PrimeReactProvider>
 );
