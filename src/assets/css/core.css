@@ -26481,11 +26481,6 @@ body {
      -moz-osx-font-smoothing: grayscale
 }
 
-.layout-wrapper,
-body {
-     background-color: var(--surface-ground)
-}
-
 a {
      text-decoration: none
 }

@@ -1,4 +1,4 @@
-import { CHANGE_PASSWORD_ENDPOINT, DELETE_USER_ENDPOINT, IMAGE_UPLOAD_ENDPOINT, SING_UP_ENDPOINT, UPDATE_USER_ENDPOINT, USER_ENDPOINT } from "../config/constants.d";
+import { CHANGE_PASSWORD_ENDPOINT, DELETE_USER_ENDPOINT, IMAGE_UPLOAD_ENDPOINT, USER_ENDPOINT, UPDATE_USER_ENDPOINT } from "../config/constants.d";
 import AppService from "../services/AppService";
 import { ChangePassword, RegisterUser, UpdateUser, UserData, UserDataToken } from '../types/user-data.type';
 
@@ -27,7 +27,7 @@ export class UserController {
      }
 
      public Create = async (user: RegisterUser): Promise<string | undefined> => {
-          const service = new AppService(this._userDataToken, SING_UP_ENDPOINT);
+          const service = new AppService(this._userDataToken, USER_ENDPOINT);
           try {
                const data = await service.Post(user)
                     .catch(error => {

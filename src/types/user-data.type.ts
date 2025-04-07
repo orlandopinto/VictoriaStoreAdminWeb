@@ -44,7 +44,9 @@ export type RegisterUser = {
 }
 
 export type UpdateUser = {
-     id: string;
+     _id: string;
+     email: string;
+     password: string;
      address?: string;
      firstName?: string;
      lastName?: string;

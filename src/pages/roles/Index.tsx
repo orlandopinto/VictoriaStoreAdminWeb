@@ -85,8 +85,8 @@ const IndexRoles = () => {
      const loadUsersData = async () => {
           try {
                const controller = new UserController(userLoggedData!)
-               const data = await controller.GetUsers();
-               setUserList(data as unknown as UserData[])
+               const data = await controller.GetUsers() as unknown as ApiResultResponse;
+               setUserList(data?.data as unknown as UserData[])
 
           } catch (err) {
                console.log('error: ', err)

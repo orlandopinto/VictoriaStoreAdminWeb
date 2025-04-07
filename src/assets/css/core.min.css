@@ -21460,10 +21460,10 @@ body {
      color: var(--text-color)
 }
 
-.layout-wrapper,
+/* .layout-wrapper,
 body {
      background-color: var(--surface-ground)
-}
+} */
 
 ::-moz-selection {
      background-color: var(--highlight-bg);

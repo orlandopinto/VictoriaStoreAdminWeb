@@ -5,3 +5,5 @@ export * from './user-data.type'
 export * from './refresh-token.type'
 export * from './user-data.type';
 export * from './categories';
+export * from './product-type'
+export * from './discount.type'

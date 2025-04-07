@@ -10,7 +10,7 @@ import logo from '../../assets/svg/logo.svg';
 import { useAuth } from '../../hooks';
 import SwitchLanguages from './LanguageSwitcher';
 import './navigation.css';
-import SideBar from './SideBar';
+import AppSideBar from './AppSideBar';
 import ThemeSelection from './ThemeSelection';
 import { CLOUDINARY_NAME } from '../../config/envs.d';
 
@@ -19,12 +19,14 @@ const Navigation = () => {
      const { logout, userLoggedData } = useAuth()
      const [visible, setVisible] = useState(false);
 
-     const barsItemRenderer = (item: any) => (
-          <Link to="" onClick={() => setVisible(true)} className="flex align-items-center p-menuitem-link p-3">
-               <span className={item.icon} />
-               <Ripple />
-          </Link>
-     );
+     const barsItemRenderer = (item: any) => {
+          return (
+               <Link to="" onClick={() => setVisible(true)} className="flex align-items-center p-menuitem-link p-3">
+                    <span className={item.icon} />
+                    <Ripple />
+               </Link>
+          )
+     };
 
      const dashboardItemRenderer = (item: any) => (
           <Link to="/dashboard" className="flex align-items-center p-menuitem-link p-3">
@@ -72,68 +74,68 @@ const Navigation = () => {
                icon: 'pi pi-bars',
                template: barsItemRenderer
           },
-          {
-               label: 'Dashboard',
-               icon: 'pi pi-th-large',
-               template: dashboardItemRenderer
-          },
-          {
-               label: 'Taxes',
-               icon: 'pi pi-wallet',
-               path: '/taxes',
-               template: taxesItemRenderer
-          },
-          {
-               label: 'Discounts',
-               icon: 'pi pi-envelope',
-               badge: 3,
-               template: discountsItemRenderer
-          },
-          {
-               label: 'Projects',
-               icon: 'pi pi-search',
-               items: [
-                    {
-                         label: 'Core',
-                         icon: 'pi pi-bolt',
-                         shortcut: '⌘+S',
-                         template: itemRenderer
-                    },
-                    {
-                         label: 'Blocks',
-                         icon: 'pi pi-server',
-                         shortcut: '⌘+B',
-                         template: itemRenderer
-                    },
-                    {
-                         label: 'UI Kit',
-                         icon: 'pi pi-pencil',
-                         shortcut: '⌘+U',
-                         template: itemRenderer
-                    },
-                    {
-                         separator: true
-                    },
-                    {
-                         label: 'Templates',
-                         icon: 'pi pi-palette',
-                         items: [
-                              {
-                                   label: 'Apollo',
-                                   icon: 'pi pi-palette',
-                                   badge: 2,
-                                   template: itemRenderer
-                              },
-                              {
-                                   label: 'Ultima',
-                                   icon: 'pi pi-palette',
-                                   badge: 3,
-                                   template: itemRenderer
-                              }
-                         ]
-                    }
-               ]
-          }
+          // {
+          //      label: 'Dashboard',
+          //      icon: 'pi pi-th-large',
+          //      template: dashboardItemRenderer
+          // },
+          // {
+          //      label: 'Taxes',
+          //      icon: 'pi pi-wallet',
+          //      path: '/taxes',
+          //      template: taxesItemRenderer
+          // },
+          // {
+          //      label: 'Discounts',
+          //      icon: 'pi pi-envelope',
+          //      badge: 3,
+          //      template: discountsItemRenderer
+          // },
+          // {
+          //      label: 'Projects',
+          //      icon: 'pi pi-search',
+          //      items: [
+          //           {
+          //                label: 'Core',
+          //                icon: 'pi pi-bolt',
+          //                shortcut: '⌘+S',
+          //                template: itemRenderer
+          //           },
+          //           {
+          //                label: 'Blocks',
+          //                icon: 'pi pi-server',
+          //                shortcut: '⌘+B',
+          //                template: itemRenderer
+          //           },
+          //           {
+          //                label: 'UI Kit',
+          //                icon: 'pi pi-pencil',
+          //                shortcut: '⌘+U',
+          //                template: itemRenderer
+          //           },
+          //           {
+          //                separator: true
+          //           },
+          //           {
+          //                label: 'Templates',
+          //                icon: 'pi pi-palette',
+          //                items: [
+          //                     {
+          //                          label: 'Apollo',
+          //                          icon: 'pi pi-palette',
+          //                          badge: 2,
+          //                          template: itemRenderer
+          //                     },
+          //                     {
+          //                          label: 'Ultima',
+          //                          icon: 'pi pi-palette',
+          //                          badge: 3,
+          //                          template: itemRenderer
+          //                     }
+          //                ]
+          //           }
+          //      ]
+          // }
      ];
 
      const profileHederMenuItemRenderer = () => (
@@ -216,9 +218,13 @@ const Navigation = () => {
           </div>
      );
 
+     const getWindowPathName = () => {
+          return window.location.pathname
+     }
+
      return (
           <>
-               <SideBar visible={visible} setVisible={setVisible} />
+               <AppSideBar visible={visible} setVisible={setVisible} windowPathName={getWindowPathName()} />
                <Menubar id="NavBar" model={items} start={start} end={end} />
                <Toast ref={toast} />
           </>

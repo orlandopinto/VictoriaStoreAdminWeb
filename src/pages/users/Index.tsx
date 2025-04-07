@@ -5,7 +5,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { Button, Card, confirmDialog, ConfirmDialog, Dialog } from '../../components/primereact/index';
 import { UserController } from "../../controllers/user.controller";
 import { useAuth } from "../../hooks";
-import { PermissionsByRole, UserData } from "../../types";
+import { ApiResultResponse, PermissionsByRole, UserData } from "../../types";
 import UsersDataTable from './UsersDataTable';
 import "./index.css";
 
@@ -14,7 +14,7 @@ const IndexUser = () => {
 
      //..:: [ HOOKS ] ::..
      //WARNING: ..:: [ Las siguientes lineas son obligatiorias para ejecutar los permisos ]::..
-     const { userLoggedData, logout, hasAction, getPermissionList, isAllowed } = useAuth();
+     const { userLoggedData, logout, getPermissionList, isAllowed } = useAuth();
      const navigate = useNavigate();
      //..::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::..
 
@@ -30,7 +30,7 @@ const IndexUser = () => {
      const [, setLoading] = useState<boolean>(true);
      const [visibleRight, setVisibleRight] = useState<boolean>(false);
      const [dialogVisible, setDialogVisible] = useState(false);
-     const [permissionsByRole, setPermissionsByRole] = useState([] as PermissionsByRole[])
+     const [, setPermissionsByRole] = useState([] as PermissionsByRole[])
 
      //..:: [ FUNCTIONS ] ::..
 
@@ -40,8 +40,8 @@ const IndexUser = () => {
                     navigate('/errors/403');
                }
 
-               const data = await controller.GetUsers();
-               setUserList(data as unknown as UserData[])
+               const data = await controller.GetUsers() as unknown as ApiResultResponse;
+               setUserList(data?.data as unknown as UserData[])
                const permissionsByRole = getPermissionList(window.location.pathname.replace("/", ""))
                setPermissionsByRole(permissionsByRole as PermissionsByRole[])
                setLoading(false)

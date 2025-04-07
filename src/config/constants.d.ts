@@ -1,12 +1,16 @@
 export const URL_BASE = 'http://localhost:3000'
-export const URL_BASE_API = 'http://localhost:3500'
-export const AUTH_ENDPOINT = '/api/systemauth'
-export const REFRESH_TOKEN_ENDPOINT = '/api/systemauth/refresh'
-export const CHANGE_PASSWORD_ENDPOINT = '/api/systemauth/change-password'
-export const USER_ENDPOINT = '/api/systemauth'
-export const SING_UP_ENDPOINT = '/api/systemauth/signup'
-export const UPDATE_USER_ENDPOINT = '/api/systemauth/:id'
-export const DELETE_USER_ENDPOINT = '/api/systemauth'
+
+//SYSTEM AUTHORIZATION
+export const SING_IN_ENDPOINT = '/api/system-auth/signin'
+export const REFRESH_TOKEN_ENDPOINT = '/api/system-auth/refresh'
+export const CHANGE_PASSWORD_ENDPOINT = '/api/system-auth/change-password'
+
+// SYSTEM USERS
+export const USER_ENDPOINT = '/api/system-users'
+export const UPDATE_USER_ENDPOINT = '/api/system-users/:id'
+export const DELETE_USER_ENDPOINT = '/api/system-users'
+
+//ADMIN
 export const ROLES_ENDPOINT = '/api/roles'
 export const ACCESS_ENDPOINT = '/api/access'
 export const PAGES_ENDPOINT = '/api/pages'
@@ -15,15 +19,27 @@ export const PERMISSION_ENDPOINT = '/api/permissions'
 export const CATEGORY_ENDPOINT = '/api/category'
 export const SUB_CATEGORY_ENDPOINT = '/api/sub-category'
 
+// PRODUCTS
+export const ATTRIBUTES_ENDPOINT = '/api/attributes'
+export const DISCOUNTS_ENDPOINT = '/api/discounts'
+export const WISHLIST_ENDPOINT = '/api/wishlist'
+export const SHIPPING_ADDRESS_ENDPOINT = '/api/shipping-address'
+export const PRODUCT_IMAGES_ENDPOINT = '/api/product-images'
+export const PRODUCT_VIDEOS_ENDPOINT = '/api/product-videos'
+export const PRODUCTS_ENDPOINT = '/api/products'
+export const REVIEWS_ENDPOINT = '/api/reviews'
+export const VARIANTS_ENDPOINT = '/api/variants'
+export const TAXES_ENDPOINT = '/api/taxes'
+
 //IMAGES
 export const PROFILE_FOLDER_TO_UPLOAD = 'ProfileImages'
 export const CATEGORY_FOLDER_TO_UPLOAD = 'CategoryImages'
-const CLOUDINARY_NAME = process.env.CLOUDINARY_NAME
-
-export const DEFAULT_USER_IMAGE = `https://res.cloudinary.com/${CLOUDINARY_NAME}/image/upload/v1741195879/${PROFILE_FOLDER_TO_UPLOAD}/lymtcvke4mmgdxhj61la.png`
-
 export const IMAGE_UPLOAD_ENDPOINT = '/api/upload'
 
+const CLOUDINARY_NAME = process.env.CLOUDINARY_NAME
+export const DEFAULT_USER_IMAGE = `https://res.cloudinary.com/${CLOUDINARY_NAME}/image/upload/v1741195879/${PROFILE_FOLDER_TO_UPLOAD}/lymtcvke4mmgdxhj61la.png`
+
+// OTHERS
 export const METHOD = {
      GET: 'GET',
      POST: 'POST',

@@ -1,0 +1,4 @@
+.overlay-add-tax>.p-sidebar-header,
+.overlay-add-discount>.p-sidebar-header {
+     flex-direction: row-reverse;
+}

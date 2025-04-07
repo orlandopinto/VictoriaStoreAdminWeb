@@ -1,5 +1,5 @@
 import axios from "axios";
-import { AUTH_ENDPOINT, METHOD, URL_BASE } from "../config/constants.d";
+import { SING_IN_ENDPOINT, METHOD, URL_BASE } from "../config/constants.d";
 
 export class AuthService {
 
@@ -7,7 +7,7 @@ export class AuthService {
 
           try {
                const result = await axios({
-                    url: `${URL_BASE}${AUTH_ENDPOINT}/signin`,
+                    url: `${URL_BASE}${SING_IN_ENDPOINT}`,
                     method: METHOD.POST,
                     headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
                     data: { "email": email, "password": password }

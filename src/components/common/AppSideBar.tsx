@@ -3,23 +3,38 @@ import { Avatar } from 'primereact/avatar';
 import { Ripple } from 'primereact/ripple';
 import { Sidebar } from 'primereact/sidebar';
 import { StyleClass } from 'primereact/styleclass';
-import { Dispatch, SetStateAction, useRef } from 'react';
+import { Dispatch, SetStateAction, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import profilePicture from '../../assets/images/Orlando.png';
 import logo from '../../assets/svg/logo.svg';
-import profilePicture from '../../assets/images/Orlando.png'
 import './sidebar.css';
 
 interface Props {
      visible: boolean
      setVisible: Dispatch<SetStateAction<boolean>>
+     windowPathName: string
 }
 
-export default function SideBar({ visible, setVisible }: Props) {
+export default function AppSideBar({ visible, setVisible, windowPathName }: Props) {
      const btnRef2 = useRef<any>(null);
      const btnRef3 = useRef<any>(null);
+     const [selectedElementList, setSelectedElementList] = useState('');
+     const PERMISSION_ADMINISTRATION = "user-and-permission-element-list-items"
+     const STORE_ADMINISTRATION = "store-administration-element-list-items"
 
      const closeSideBar = () => {
-          setVisible(false)
+          setVisible(false);
+     }
+     const isActive = (node: string) => {
+          document.querySelectorAll('.list-none').forEach(item => {
+               item.classList.toggle('hidden', item.id !== selectedElementList && item.id !== '');
+          });
+          return windowPathName === node ? 'active' : '';
+     }
+
+     const showHideElementList = (elementList?: string) => {
+          setSelectedElementList(elementList!);
+          closeSideBar();
      }
 
      return (
@@ -44,9 +59,9 @@ export default function SideBar({ visible, setVisible }: Props) {
                                         <div className="overflow-y-auto pt-4">
                                              <ul className="list-none p-0 m-0">
                                                   <li>
-                                                       <ul className="list-none p-0 m-0 overflow-hidden">
+                                                       <ul className="u-list list-none p-0 m-0 overflow-hidden">
                                                             <li>
-                                                                 <Link to="/dashboard" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                 <Link to="/dashboard" onClick={() => showHideElementList()} className={`${isActive('/dashboard')} p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full`}>
                                                                       <i className="pi pi-th-large mr-2"></i>
                                                                       <span className="font-medium">Dashboard</span>
                                                                       <Ripple />
@@ -55,22 +70,22 @@ export default function SideBar({ visible, setVisible }: Props) {
                                                             <li>
                                                                  <StyleClass nodeRef={btnRef2} selector="@next" enterFromClassName="hidden" enterActiveClassName="slidedown" leaveToClassName="hidden" leaveActiveClassName="slideup">
                                                                       <a ref={btnRef2} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                                                                           <i className="pi pi-cog mr-2"></i>
-                                                                           <span className="font-medium">User Administration</span>
+                                                                           <i className="pi pi-shield mr-2"></i>
+                                                                           <span className="font-medium">User and Permissions</span>
                                                                            <i className="pi pi-chevron-down ml-auto mr-1"></i>
                                                                            <Ripple />
                                                                       </a>
                                                                  </StyleClass>
-                                                                 <ul className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
+                                                                 <ul id={PERMISSION_ADMINISTRATION} className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
                                                                       <li>
-                                                                           <Link to="/users" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                           <Link to="/users" onClick={() => showHideElementList(PERMISSION_ADMINISTRATION)} className={`${isActive('/users')} p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full`}>
                                                                                 <i className="pi pi-users mr-2"></i>
                                                                                 <span className="font-medium">Users</span>
                                                                                 <Ripple />
                                                                            </Link>
                                                                       </li>
                                                                       <li>
-                                                                           <Link to="/roles" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
+                                                                           <Link to="/roles" onClick={() => showHideElementList(PERMISSION_ADMINISTRATION)} className={`${isActive('/roles')} p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full`}>
                                                                                 <i className="pi pi-lock mr-2"></i>
                                                                                 <span className="font-medium">Roles and Permissions</span>
                                                                                 <Ripple />
@@ -87,32 +102,46 @@ export default function SideBar({ visible, setVisible }: Props) {
                                                                            <Ripple />
                                                                       </a>
                                                                  </StyleClass>
-                                                                 <ul className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
+                                                                 <ul id={STORE_ADMINISTRATION} className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
                                                                       <li>
-                                                                           <Link to="/categories" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                                                                                <i className="pi pi-wallet mr-2"></i>
+                                                                           <Link to="/categories" onClick={() => showHideElementList(STORE_ADMINISTRATION)} className={` ${isActive('/categories')} p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full`}>
+                                                                                <i className="pi pi-tag mr-2"></i>
                                                                                 <span className="font-medium">Categories</span>
                                                                                 <Ripple />
                                                                            </Link>
                                                                       </li>
                                                                       <li>
-                                                                           <Link to="/subcategories" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                                                                                <i className="pi pi-wallet mr-2"></i>
+                                                                           <Link to="/subcategories" onClick={() => showHideElementList(STORE_ADMINISTRATION)} className={` ${isActive('/subcategories')} p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full`}>
+                                                                                <i className="pi pi-tags mr-2"></i>
                                                                                 <span className="font-medium">Sub categories</span>
                                                                                 <Ripple />
                                                                            </Link>
                                                                       </li>
                                                                       <li>
-                                                                           <Link to="/taxes" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                                                                                <i className="pi pi-wallet mr-2"></i>
+                                                                           <Link to="/taxes" onClick={() => showHideElementList(STORE_ADMINISTRATION)} className={` ${isActive('/taxes')} p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full`}>
+                                                                                <i className="pi pi-money-bill mr-2"></i>
                                                                                 <span className="font-medium">Taxes</span>
                                                                                 <Ripple />
                                                                            </Link>
                                                                       </li>
                                                                       <li>
-                                                                           <Link to="/discounts" onClick={closeSideBar} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
-                                                                                <i className="pi pi-money-bill mr-2"></i>
+                                                                           <Link to="/discounts" onClick={() => showHideElementList(STORE_ADMINISTRATION)} className={` ${isActive('/discounts')} p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full`}>
+                                                                                <i className="pi pi-hashtag mr-2"></i>
                                                                                 <span className="font-medium">Discounts</span>
+                                                                                <Ripple />
+                                                                           </Link>
+                                                                      </li>
+                                                                      <li>
+                                                                           <Link to="/misc" onClick={() => showHideElementList(STORE_ADMINISTRATION)} className={` ${isActive('/misc')} p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full`}>
+                                                                                <i className="pi pi-box mr-2"></i>
+                                                                                <span className="font-medium">Miscelaneos</span>
+                                                                                <Ripple />
+                                                                           </Link>
+                                                                      </li>
+                                                                      <li>
+                                                                           <Link to="/products" onClick={() => showHideElementList(STORE_ADMINISTRATION)} className={` ${isActive('/products') || isActive('/products/create') || isActive('/products/edit')} p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full`}>
+                                                                                <i className="pi pi-box mr-2"></i>
+                                                                                <span className="font-medium">Products</span>
                                                                                 <Ripple />
                                                                            </Link>
                                                                       </li>
@@ -162,3 +191,4 @@ export default function SideBar({ visible, setVisible }: Props) {
           </Sidebar>
      )
 }
+

@@ -1,3 +1,4 @@
+
 export class Helper {
 
      static async DataUrlToFile(dataUrl: string, fileName: string): Promise<File> {
@@ -22,5 +23,20 @@ export class Helper {
                hour12: false
           };
           return date.toLocaleString(undefined, options).replace(',', ' ');
+     }
+
+     /**
+      * 
+      * @param arr List object array
+      * @param keys name field separate with comma. exmample: ExtractValuesFromListObject(list, 'name', 'age');
+      * @returns New list with fields specified
+      */
+     static ExtractValuesFromListObject = <T, K extends keyof T>(arr: T[], ...keys: K[]) =>
+          keys.length > 1 ?
+               arr.map((i: T) => keys.map(k => i[k])) :
+               arr.map((i: T) => i[keys[0]]);
+
+     static converToDecimal = (value: any) => {
+          return value.$numberDecimal
      }
 }

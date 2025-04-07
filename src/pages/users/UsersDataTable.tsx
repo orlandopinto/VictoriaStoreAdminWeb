@@ -1,10 +1,9 @@
 import { toPng } from 'html-to-image';
-import { FilterMatchMode } from "primereact/api";
 import { Sidebar } from "primereact/sidebar";
 import { Toast } from "primereact/toast";
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Column, confirmDialog, ConfirmDialog, DataTable, DataTableFilterMeta, IconField, InputIcon, InputMask, InputSwitch, InputText, MultiSelect, MultiSelectChangeEvent, TabPanel, TabView, Tag, Tooltip } from "../../components/primereact";
+import { Button, Column, confirmDialog, ConfirmDialog, DataTable, IconField, InputIcon, InputMask, InputSwitch, InputText, MultiSelect, MultiSelectChangeEvent, TabPanel, TabView, Tag, Tooltip } from "../../components/primereact";
 import { ACTIONS, PROFILE_FOLDER_TO_UPLOAD } from "../../config/constants.d";
 import { RoleController, UserController } from "../../controllers";
 import { useAuth } from "../../hooks";
@@ -12,8 +11,9 @@ import { ChangePassword, PermissionsByRole, RegisterUser, Role, UpdateUser, User
 import { CloudinaryResult } from "../../types/cloudinary-result.type";
 import { ApiResultResponse } from '../../types/environment-response.type';
 import { Validators } from "../../utils";
-import { Helper } from "../../utils/Helper";
 import ProfileImage from "./ProfileImage";
+import { Helper } from '../../utils/Helper';
+import { onGlobalFilterChange, useFilters } from '../../hooks/useFilters';
 
 const UsersDataTable = () => {
 
@@ -51,22 +51,13 @@ const UsersDataTable = () => {
      const [roleList, setRoleList] = useState<FilterRoleList[]>([] as FilterRoleList[])
      const [permissionsByRole, setPermissionsByRole] = useState([] as PermissionsByRole[])
      const [loading, setLoading] = useState<boolean>(true);
-     //const [, setVisibleRight] = useState<boolean>(false);
      const [overlayVisible, setOverlayVisible] = useState<boolean>(false);
-     const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
      const [showOverlayAlertModal, setShowOverlayAlertModal] = useState(false);
      const [userSelectedToDelete, setUserSelectedToDelete] = useState<UserData>({} as UserData)
      const [showDeleteUserModal, setShowDeleteUserModal] = useState(false);
      const [filterRoleList, setFilterRoleList] = useState<FilterRoleList[]>([]);
      const [profileName, setProfileName] = useState<[string, string]>(['?', '']);
-     const [filters, setFilters] = useState<DataTableFilterMeta>({
-          global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-          'email': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-          representative: { value: null, matchMode: FilterMatchMode.IN },
-          status: { value: null, matchMode: FilterMatchMode.EQUALS },
-          verified: { value: null, matchMode: FilterMatchMode.EQUALS }
-     });
+     const { filters, setFilters, globalFilterValue, setGlobalFilterValue } = useFilters();
      const [isEdit, setIsEdit] = useState(false);
      const [profileImageBackgroundColor, setProfileImageBackgroundColor] = useState('')
      const [userDataToEdit, setUserDataToEdit] = useState<UserData>({} as UserData);
@@ -78,7 +69,7 @@ const UsersDataTable = () => {
      const [editConfirmPassword, setEditConfirmPassword] = useState('');
 
      useEffect(() => {
-          getData()
+          getData();
      }, [])
 
      //..:: [ FUNCTIONS ] ::..
@@ -100,8 +91,12 @@ const UsersDataTable = () => {
      const loadUsersData = async () => {
           try {
                const controller = new UserController(userLoggedData!)
-               const data = await controller.GetUsers();
-               setUserList(data as unknown as UserData[]);
+               const result = await controller.GetUsers() as unknown as ApiResultResponse;
+               if (result.hasError) {
+                    alertModal(new Error(result.message));
+                    return;
+               }
+               setUserList(result.data as unknown as UserData[]);
           } catch (err) {
                console.log('error: ', err)
                alertModal(err);
@@ -115,9 +110,13 @@ const UsersDataTable = () => {
      const loadRolesData = async () => {
           try {
                const controller = new RoleController(userLoggedData!);
-               const data = await controller.GetRoles() as unknown as ApiResultResponse;
+               const result = await controller.GetRoles() as unknown as ApiResultResponse;
+               if (result.hasError) {
+                    alertModal(new Error(result.message));
+                    return;
+               }
                let filterRoleList: FilterRoleList[] = []
-               for (const role of (data.data as unknown as Role[])) {
+               for (const role of (result.data as unknown as Role[])) {
                     filterRoleList.push({ roleName: role.roleName, _id: role._id as string });
                }
                setFilterRoleList(filterRoleList);
@@ -149,16 +148,6 @@ const UsersDataTable = () => {
                     //reject: closeModal
                });
           }
-     };
-
-     const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-          e.preventDefault();
-          const value = e.target.value;
-          let _filters = { ...filters };
-          // @ts-ignore
-          _filters['global'].value = value;
-          setFilters(_filters);
-          setGlobalFilterValue(value);
      };
 
      const initRegisterUserValues = (isCancel?: boolean) => {
@@ -194,7 +183,7 @@ const UsersDataTable = () => {
                     <div>
                          <IconField iconPosition="left">
                               <InputIcon className="pi pi-search" />
-                              <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Buscar" className="p-inputtext-sm" style={{ width: '100%' }} />
+                              <InputText value={globalFilterValue} onChange={(e) => onGlobalFilterChange(e, filters, setFilters, setGlobalFilterValue)} placeholder="Buscar" className="p-inputtext-sm" style={{ width: '100%' }} />
                          </IconField>
                     </div>
                     {permissionsByRole.length > 0 && hasAction(ACTIONS.CREATE) && <div><Button icon={"pi pi-plus"} label="Nuevo usuario" className="" onClick={() => openOverlay()}></Button></div>}
@@ -431,7 +420,9 @@ const UsersDataTable = () => {
           try {
                const controller = new UserController(userLoggedData!);
                const user: UpdateUser = {
-                    id: userDataToEdit._id!,
+                    _id: userDataToEdit._id!,
+                    email: userDataToEdit.email,
+                    password: userDataToEdit.password,
                     address: userDataToEdit.address,
                     firstName: inputTextEditFirstNameRef.current?.value!,
                     lastName: inputTextEditLastNameRef.current?.value!,
@@ -454,7 +445,7 @@ const UsersDataTable = () => {
                toast.current?.show({ severity: 'success', summary: 'updated', detail: result.message, life: 3000 });
 
                for (let usr of userList) {
-                    if (usr._id === user.id) {
+                    if (usr._id === user._id) {
                          usr.firstName = user.firstName;
                          usr.lastName = user.lastName;
                          usr.phoneNumber = user.phoneNumber;
@@ -488,7 +479,10 @@ const UsersDataTable = () => {
                     newPassword: inputTextEditConfirmPasswordRef.current?.value!,
                }
                const result = await controller.ChangePassword(params) as unknown as ApiResultResponse
-               if (result.hasError) throw new Error(result.message);
+               if (result.hasError) {
+                    alertModal(new Error(result.message));
+                    return;
+               }
                toast.current?.show({ severity: 'success', summary: 'updated', detail: result.message, life: 3000 });
                setOverlayVisible(false);
           } catch (err) {

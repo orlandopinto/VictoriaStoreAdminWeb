@@ -1,0 +1,15 @@
+.field {
+     margin-bottom: 0;
+}
+
+.p-card {
+     border: 1px solid var(--surface-100);
+}
+
+.p-fileupload-content>div>i {
+     margin: .60rem 0rem !important;
+}
+
+.p-fileupload-content>div>span {
+     margin-bottom: .5rem !important;
+}
